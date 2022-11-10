@@ -24,16 +24,16 @@
 /**
  * @test
  * @bug 8240248
- * @summary Add C2 x86 Superword support for scalar logical reduction optimizations : double test
+ * @summary Add C2 x86 Superword support for scalar logical reduction optimizations : float test
  * @library /test/lib /
- * @run driver compiler.loopopts.superword.RedTest_double
+ * @run driver compiler.loopopts.superword.RedTest_float
 */
 
 package compiler.loopopts.superword;
 
 import compiler.lib.ir_framework.*;
 
-public class RedTest_double {
+public class RedTest_float {
     static final int NUM = 512;
     static final int ITER = 8000;
     public static void main(String[] args) throws Exception {
@@ -58,13 +58,13 @@ public class RedTest_double {
     @Run(test = {"sumReductionImplement"},
       mode = RunMode.STANDALONE)
     public void runTests() throws Exception {
-	double[] a = new double[NUM];
-        double[] b = new double[NUM];
-        double[] c = new double[NUM];
-        double[] d = new double[NUM];
+	float[] a = new float[NUM];
+        float[] b = new float[NUM];
+        float[] c = new float[NUM];
+        float[] d = new float[NUM];
         sumReductionInit(a, b, c);
-        double total = 0;
-        double valid = 0;
+        float total = 0;
+        float valid = 0;
         for (int j = 0; j < ITER; j++) {
             total = sumReductionImplement(a, b, c, d);
         }
@@ -75,9 +75,9 @@ public class RedTest_double {
     }
 
     public static void sumReductionInit(
-            double[] a,
-            double[] b,
-            double[] c) {
+            float[] a,
+            float[] b,
+            float[] c) {
         for (int j = 0; j < 1; j++) {
             for (int i = 0; i < a.length; i++) {
                 a[i] = i * 1 + j;
@@ -87,20 +87,19 @@ public class RedTest_double {
         }
     }
  
-    // TODO check if this is correct -- run SumRed_Double.java 
     @Test
     @IR(applyIfCPUFeature = {"ssse3", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
-        counts = {IRNode.ADD_REDUCTION_VD, ">= 1"})
+        counts = {IRNode.ADD_REDUCTION_VF, ">= 1"})
     @IR(applyIfCPUFeature = {"sve", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
-        counts = {IRNode.ADD_REDUCTION_VD, ">= 1"})
-    public static double sumReductionImplement(
-            double[] a,
-            double[] b,
-            double[] c,
-            double[] d) {
-        double total = 0;
+        counts = {IRNode.ADD_REDUCTION_VF, ">= 1"})
+    public static float sumReductionImplement(
+            float[] a,
+            float[] b,
+            float[] c,
+            float[] d) {
+        float total = 0;
         for (int i = 0; i < a.length; i++) {
             d[i] = (a[i] * b[i]) + (a[i] * c[i]) + (b[i] * c[i]);
             total += d[i];
@@ -109,8 +108,8 @@ public class RedTest_double {
     }
 
     public static void testCorrectness(
-            double total,
-            double valid,
+            float total,
+            float valid,
             String op) throws Exception {
         if (total == valid) {
             System.out.println(op + ": Success");

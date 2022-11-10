@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2014, 2022, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -23,20 +23,22 @@
 
 /**
  * @test
- * @bug 8240248
- * @summary Add C2 x86 Superword support for scalar logical reduction optimizations : double test
+ * @bug 8135028
+ * @summary Add C2 x86 Superword support for scalar sum reduction optimizations : double sqrt test
  * @library /test/lib /
- * @run driver compiler.loopopts.superword.RedTest_double
-*/
+ * @run driver compiler.loopopts.superword.RedTest_Sqrt_double
+ */
+
 
 package compiler.loopopts.superword;
 
 import compiler.lib.ir_framework.*;
 
-public class RedTest_double {
-    static final int NUM = 512;
-    static final int ITER = 8000;
+public class RedTest_Sqrt_double {
+    static final int NUM = 256 * 1024;
+    static final int ITER = 2000;
     public static void main(String[] args) throws Exception {
+
         TestFramework framework = new TestFramework();
         framework.addFlags("-XX:+IgnoreUnrecognizedVMOptions",
                            "-XX:LoopUnrollLimit=250",
@@ -52,13 +54,13 @@ public class RedTest_double {
                                                "-XX:LoopMaxUnroll=" + maxUnroll);
                 i++;
             }
-        }
+        }	
     }
 
     @Run(test = {"sumReductionImplement"},
-      mode = RunMode.STANDALONE)
+        mode = RunMode.STANDALONE)
     public void runTests() throws Exception {
-	double[] a = new double[NUM];
+        double[] a = new double[NUM];
         double[] b = new double[NUM];
         double[] c = new double[NUM];
         double[] d = new double[NUM];
@@ -66,12 +68,12 @@ public class RedTest_double {
         double total = 0;
         double valid = 0;
         for (int j = 0; j < ITER; j++) {
-            total = sumReductionImplement(a, b, c, d);
-        }
-        for (int j = 0; j < d.length; j++) {
-            valid += d[j];
-        }
-        testCorrectness(total, valid, "Add Reduction");
+            total = sumReductionImplement(a, b, c, d, total);
+	}
+	for (int j = 0; j < ITER; j++) {
+	    valid += d[j];
+	}
+	testCorrectness(total, valid, "Sum Reduction Sqrt");
     }
 
     public static void sumReductionInit(
@@ -86,8 +88,8 @@ public class RedTest_double {
             }
         }
     }
- 
-    // TODO check if this is correct -- run SumRed_Double.java 
+
+    // TODO check if this is right
     @Test
     @IR(applyIfCPUFeature = {"ssse3", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
@@ -95,14 +97,16 @@ public class RedTest_double {
     @IR(applyIfCPUFeature = {"sve", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
         counts = {IRNode.ADD_REDUCTION_VD, ">= 1"})
+    @IR(applyIfAnd = {"SuperWordReductions", "false"},
+        counts = {IRNode.ADD_REDUCTION_VD, "== 0"})
     public static double sumReductionImplement(
             double[] a,
             double[] b,
             double[] c,
-            double[] d) {
-        double total = 0;
+            double[] d,
+            double total) {
         for (int i = 0; i < a.length; i++) {
-            d[i] = (a[i] * b[i]) + (a[i] * c[i]) + (b[i] * c[i]);
+            d[i] = Math.sqrt(a[i] * b[i]) + Math.sqrt(a[i] * c[i]) + Math.sqrt(b[i] * c[i]);
             total += d[i];
         }
         return total;
@@ -121,4 +125,3 @@ public class RedTest_double {
         }
     }
 }
-

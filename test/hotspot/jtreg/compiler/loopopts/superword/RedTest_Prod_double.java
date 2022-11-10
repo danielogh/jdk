@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2020, 2022, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -23,18 +23,18 @@
 
 /**
  * @test
- * @bug 8240248
- * @summary Add C2 x86 Superword support for scalar logical reduction optimizations : double test
+ * @bug 8074981
+ * @summary Add C2 x86 Superword support for scalar product reduction optimizations : double test
  * @library /test/lib /
- * @run driver compiler.loopopts.superword.RedTest_double
-*/
+ * @run driver compiler.loopopts.superword.RedTest_Prod_double
+ */
 
 package compiler.loopopts.superword;
 
 import compiler.lib.ir_framework.*;
 
-public class RedTest_double {
-    static final int NUM = 512;
+public class RedTest_Prod_double {
+    static final int NUM = 1024;
     static final int ITER = 8000;
     public static void main(String[] args) throws Exception {
         TestFramework framework = new TestFramework();
@@ -47,7 +47,7 @@ public class RedTest_double {
         Scenario[] scenarios = new Scenario[8];
         for (String reductionSign : new String[] {"+", "-"}) {
             for (int maxUnroll : new int[] {2, 4, 8, 16}) {
-                // REMOVE
+		// REMOVE
                 scenarios[i] = new Scenario(i, "-XX:" + reductionSign + "SuperWordReductions",
                                                "-XX:LoopMaxUnroll=" + maxUnroll);
                 i++;
@@ -55,39 +55,36 @@ public class RedTest_double {
         }
     }
 
-    @Run(test = {"sumReductionImplement"},
-      mode = RunMode.STANDALONE)
+    @Run(test = {"prodReductionImplement"},
+        mode = RunMode.STANDALONE)
     public void runTests() throws Exception {
-	double[] a = new double[NUM];
+        double[] a = new double[NUM];
         double[] b = new double[NUM];
         double[] c = new double[NUM];
         double[] d = new double[NUM];
-        sumReductionInit(a, b, c);
-        double total = 0;
-        double valid = 0;
+        prodReductionInit(a, b, c);
+        int total = 0;
+        int valid = 0;
         for (int j = 0; j < ITER; j++) {
-            total = sumReductionImplement(a, b, c, d);
+            total = prodReductionImplement(a, b, c, d);
         }
         for (int j = 0; j < d.length; j++) {
             valid += d[j];
         }
-        testCorrectness(total, valid, "Add Reduction");
+        testCorrectness(total, valid, "Prod Double Reduction");
     }
 
-    public static void sumReductionInit(
+    public static void prodReductionInit(
             double[] a,
             double[] b,
             double[] c) {
-        for (int j = 0; j < 1; j++) {
-            for (int i = 0; i < a.length; i++) {
-                a[i] = i * 1 + j;
-                b[i] = i * 1 - j;
-                c[i] = i + j;
-            }
+        for (int i = 0; i < a.length; i++) {
+            a[i] = i + 2;
+            b[i] = i + 1;
         }
     }
  
-    // TODO check if this is correct -- run SumRed_Double.java 
+    // TODO
     @Test
     @IR(applyIfCPUFeature = {"ssse3", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
@@ -95,22 +92,21 @@ public class RedTest_double {
     @IR(applyIfCPUFeature = {"sve", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
         counts = {IRNode.ADD_REDUCTION_VD, ">= 1"})
-    public static double sumReductionImplement(
+    public static int prodReductionImplement(
             double[] a,
             double[] b,
             double[] c,
             double[] d) {
-        double total = 0;
+        int total = 0;
         for (int i = 0; i < a.length; i++) {
-            d[i] = (a[i] * b[i]) + (a[i] * c[i]) + (b[i] * c[i]);
-            total += d[i];
-        }
+            total *= a[i] - b[i];
+	}
         return total;
     }
 
     public static void testCorrectness(
-            double total,
-            double valid,
+            int total,
+            int valid,
             String op) throws Exception {
         if (total == valid) {
             System.out.println(op + ": Success");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2022, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -23,18 +23,19 @@
 
 /**
  * @test
- * @bug 8240248
- * @summary Add C2 x86 Superword support for scalar logical reduction optimizations : double test
+ * @bug 8138583
+ * @summary Add C2 AArch64 Superword support for scalar sum reduction optimizations : float abs & neg test
  * @library /test/lib /
- * @run driver compiler.loopopts.superword.RedTest_double
+ * @run driver compiler.loopopts.superword.RedTest_int
 */
 
 package compiler.loopopts.superword;
 
 import compiler.lib.ir_framework.*;
 
-public class RedTest_double {
-    static final int NUM = 512;
+public class RedTest_AbsNeg_float { 
+
+    static final int NUM = 256 * 1024;
     static final int ITER = 8000;
     public static void main(String[] args) throws Exception {
         TestFramework framework = new TestFramework();
@@ -49,6 +50,7 @@ public class RedTest_double {
             for (int maxUnroll : new int[] {2, 4, 8, 16}) {
                 // REMOVE
                 scenarios[i] = new Scenario(i, "-XX:" + reductionSign + "SuperWordReductions",
+				               "-XX:LoopUnrollLimit=" + 250,
                                                "-XX:LoopMaxUnroll=" + maxUnroll);
                 i++;
             }
@@ -56,28 +58,28 @@ public class RedTest_double {
     }
 
     @Run(test = {"sumReductionImplement"},
-      mode = RunMode.STANDALONE)
+        mode = RunMode.STANDALONE)
     public void runTests() throws Exception {
-	double[] a = new double[NUM];
-        double[] b = new double[NUM];
-        double[] c = new double[NUM];
-        double[] d = new double[NUM];
+        float[] a = new float[NUM];
+        float[] b = new float[NUM];
+        float[] c = new float[NUM];
+        float[] d = new float[NUM];
         sumReductionInit(a, b, c);
-        double total = 0;
-        double valid = 0;
+        float total = 0;
+        float valid = 0;
         for (int j = 0; j < ITER; j++) {
-            total = sumReductionImplement(a, b, c, d);
+            total = sumReductionImplement(a, b, c, d, total);
         }
         for (int j = 0; j < d.length; j++) {
             valid += d[j];
         }
         testCorrectness(total, valid, "Add Reduction");
     }
-
+ 	
     public static void sumReductionInit(
-            double[] a,
-            double[] b,
-            double[] c) {
+            float[] a,
+            float[] b,
+            float[] c) {
         for (int j = 0; j < 1; j++) {
             for (int i = 0; i < a.length; i++) {
                 a[i] = i * 1 + j;
@@ -86,31 +88,30 @@ public class RedTest_double {
             }
         }
     }
- 
-    // TODO check if this is correct -- run SumRed_Double.java 
+
     @Test
     @IR(applyIfCPUFeature = {"ssse3", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
-        counts = {IRNode.ADD_REDUCTION_VD, ">= 1"})
+        counts = {IRNode.ADD_REDUCTION_VF, ">= 1"})
     @IR(applyIfCPUFeature = {"sve", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
-        counts = {IRNode.ADD_REDUCTION_VD, ">= 1"})
-    public static double sumReductionImplement(
-            double[] a,
-            double[] b,
-            double[] c,
-            double[] d) {
-        double total = 0;
+        counts = {IRNode.ADD_REDUCTION_VF, ">= 1"})
+    public static float sumReductionImplement(
+            float[] a,
+            float[] b,
+            float[] c,
+            float[] d,
+            float total) {
         for (int i = 0; i < a.length; i++) {
-            d[i] = (a[i] * b[i]) + (a[i] * c[i]) + (b[i] * c[i]);
+            d[i] = Math.abs(-a[i] * -b[i]) + Math.abs(-a[i] * -c[i]) + Math.abs(-b[i] * -c[i]);
             total += d[i];
         }
         return total;
     }
 
     public static void testCorrectness(
-            double total,
-            double valid,
+            float total,
+            float valid,
             String op) throws Exception {
         if (total == valid) {
             System.out.println(op + ": Success");
@@ -120,5 +121,5 @@ public class RedTest_double {
             throw new Exception(op + ": Failed");
         }
     }
-}
 
+}
