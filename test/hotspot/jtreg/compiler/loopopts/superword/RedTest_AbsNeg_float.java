@@ -29,6 +29,9 @@
  * @run driver compiler.loopopts.superword.RedTest_int
 */
 
+// TODO why did we need  * @requires os.arch=="aarch64" | os.arch=="riscv64" ?
+// TODO check if that was in the original test directive
+
 package compiler.loopopts.superword;
 
 import compiler.lib.ir_framework.*;
@@ -92,7 +95,7 @@ public class RedTest_AbsNeg_float {
     }
 
     @Test
-    @IR(applyIfCPUFeature = {"ssse3", "true"},
+    @IR(applyIfCPUFeature = {"sse1", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
         counts = {IRNode.ADD_REDUCTION_VF, ">= 1"})
     @IR(applyIfCPUFeature = {"sve", "true"},

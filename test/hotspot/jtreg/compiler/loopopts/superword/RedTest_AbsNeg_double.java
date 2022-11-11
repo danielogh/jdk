@@ -25,10 +25,11 @@
  * @test
  * @bug 8138583
  * @summary Add C2 AArch64 Superword support for scalar sum reduction optimizations : double abs & neg test
- * @requires os.arch=="aarch64" | os.arch=="riscv64"
  * @library /test/lib /
  * @run driver compiler.loopopts.superword.RedTest_int
 */
+
+// TODO why did we need  * @requires os.arch=="aarch64" | os.arch=="riscv64" ?
 
 package compiler.loopopts.superword;
 
@@ -92,11 +93,10 @@ public class RedTest_AbsNeg_double {
         }
     }
 
-    /*@Test
-    @IR(applyIfCPUFeature = {"ssse3", "true"},
+    // Test not applicable for x64 ?
+    @IR(applyIfCPUFeature = {"sse", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
-        counts = {IRNode.ADD_REDUCTION_VD, ">= 1"})*/
-    // Test not applicable for x64
+        counts = {IRNode.ADD_REDUCTION_VD, ">= 1"})
     @IR(applyIfCPUFeature = {"sve", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
         counts = {IRNode.ADD_REDUCTION_VD, ">= 1"})

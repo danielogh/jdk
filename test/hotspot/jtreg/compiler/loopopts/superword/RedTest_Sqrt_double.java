@@ -92,7 +92,7 @@ public class RedTest_Sqrt_double {
 
     // TODO check if this is right
     @Test
-    @IR(applyIfCPUFeature = {"ssse3", "true"},
+    @IR(applyIfCPUFeature = {"sse", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
         counts = {IRNode.ADD_REDUCTION_VD, ">= 1"})
     @IR(applyIfCPUFeature = {"sve", "true"},

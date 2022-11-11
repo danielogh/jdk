@@ -89,7 +89,7 @@ public class RedTest_float {
     }
  
     @Test
-    @IR(applyIfCPUFeature = {"ssse3", "true"},
+    @IR(applyIfCPUFeature = {"sse1", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
         counts = {IRNode.ADD_REDUCTION_VF, ">= 1"})
     @IR(applyIfCPUFeature = {"sve", "true"},

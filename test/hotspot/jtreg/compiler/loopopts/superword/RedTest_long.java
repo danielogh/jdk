@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -23,78 +23,136 @@
 
 /**
  * @test
- * @bug 8076276
- * @summary Add C2 x86 Superword support for scalar sum reduction optimizations : long test
- * @requires os.arch=="x86" | os.arch=="i386" | os.arch=="amd64" | os.arch=="x86_64"
- *
- * @run main/othervm -XX:+IgnoreUnrecognizedVMOptions -XX:LoopUnrollLimit=250
- *      -XX:CompileThresholdScaling=0.1
- *      -XX:+SuperWordReductions
- *      -XX:LoopMaxUnroll=4
- *      compiler.loopopts.superword.SumRed_Long
- * @run main/othervm -XX:+IgnoreUnrecognizedVMOptions -XX:LoopUnrollLimit=250
- *      -XX:CompileThresholdScaling=0.1
- *      -XX:-SuperWordReductions
- *      -XX:LoopMaxUnroll=4
- *      compiler.loopopts.superword.SumRed_Long
- *
- * @run main/othervm -XX:+IgnoreUnrecognizedVMOptions -XX:LoopUnrollLimit=250
- *      -XX:CompileThresholdScaling=0.1
- *      -XX:+SuperWordReductions
- *      -XX:LoopMaxUnroll=8
- *      compiler.loopopts.superword.SumRed_Long
- * @run main/othervm -XX:+IgnoreUnrecognizedVMOptions -XX:LoopUnrollLimit=250
- *      -XX:CompileThresholdScaling=0.1
- *      -XX:-SuperWordReductions
- *      -XX:LoopMaxUnroll=8
- *      compiler.loopopts.superword.SumRed_Long
+ * @bug 8240248
+ * @summary Add C2 x86 Superword support for scalar logical reduction optimizations : long test
+ * @library /test/lib /
+ * @requires os.simpleArch == "x64"
+ * @run driver compiler.loopopts.superword.RedTest_long_x64
  */
 
 package compiler.loopopts.superword;
 
-//TODO implement
+import compiler.lib.ir_framework.*;
 
-public class SumRed_Long {
+public class RedTest_long_x64 {
+    static final int NUM = 512;
+    static final int ITER = 8000;
     public static void main(String[] args) throws Exception {
-        long[] a = new long[256 * 1024];
-        long[] b = new long[256 * 1024];
-        long[] c = new long[256 * 1024];
-        long[] d = new long[256 * 1024];
-        sumReductionInit(a, b, c);
-        long total = 0;
-        long valid = 262144000;
-        for (int j = 0; j < 2000; j++) {
-            total = sumReductionImplement(a, b, c, d, total);
+        TestFramework framework = new TestFramework();
+        framework.addFlags("-XX:+IgnoreUnrecognizedVMOptions",
+                           "-XX:LoopUnrollLimit=250",
+                           "-XX:CompileThresholdScaling=0.1",
+                           "-XX:-TieredCompilation",
+                           "-XX:+RecomputeReductions");
+        int i = 0;
+        Scenario[] scenarios = new Scenario[8];
+        for (String reductionSign : new String[] {"+", "-"}) {
+            for (int maxUnroll : new int[] {2, 4, 8, 16}) {
+                scenarios[i] = new Scenario(i, "-XX:" + reductionSign + "SuperWordReductions",
+                                               "-XX:LoopMaxUnroll=" + maxUnroll);
+                i++;
+            }
         }
-        total = (int) total;
-        if (total == valid) {
-            System.out.println("Success");
-        } else {
-            System.out.println("Invalid sum of elements variable in total: " + total);
-            System.out.println("Expected value = " + valid);
-            throw new Exception("Failed");
-        }
+        framework.addScenarios(scenarios);
+        framework.start();
     }
 
-    public static void sumReductionInit(
+    @Run(test = {"sumReductionImplement",
+                 "orReductionImplement",
+                 "andReductionImplement",
+                 "xorReductionImplement",
+                 "mulReductionImplement"},
+        mode = RunMode.STANDALONE)
+    public static void runTests() throws Exception {
+        long[] a = new long[NUM];
+        long[] b = new long[NUM];
+        long[] c = new long[NUM];
+        long[] d = new long[NUM];
+        reductionInit1(a, b, c);
+        long total = 0;
+        long valid = 0;
+        for (int j = 0; j < ITER; j++) {
+            total = sumReductionImplement(a, b, c, d);
+        }
+        for (int j = 0; j < d.length; j++) {
+            valid += d[j];
+        }
+        testCorrectness(total, valid, "Add Reduction");
+
+        valid = 0;
+        for (int j = 0; j < ITER; j++) {
+            total = orReductionImplement(a, b, c, d);
+        }
+        for (int j = 0; j < d.length; j++) {
+            valid |= d[j];
+        }
+        testCorrectness(total, valid, "Or Reduction");
+
+        valid = -1;
+        for (int j = 0; j < ITER; j++) {
+            total = andReductionImplement(a, b, c, d);
+        }
+        for (int j = 0; j < d.length; j++) {
+            valid &= d[j];
+        }
+        testCorrectness(total, valid, "And Reduction");
+
+        valid = -1;
+        for (int j = 0; j < ITER; j++) {
+            total = xorReductionImplement(a, b, c, d);
+        }
+        for (int j = 0; j < d.length; j++) {
+            valid ^= d[j];
+        }
+        testCorrectness(total, valid, "Xor Reduction");
+
+        reductionInit2(a, b, c);
+        valid = 1;
+        for (int j = 0; j < ITER; j++) {
+            total = mulReductionImplement(a, b, c, d);
+        }
+        for (int j = 0; j < d.length; j++) {
+            valid *= d[j];
+        }
+        testCorrectness(total, valid, "Mul Reduction");
+    }
+
+    public static void reductionInit1(
             long[] a,
             long[] b,
             long[] c) {
-        for (int j = 0; j < 1; j++) {
-            for (int i = 0; i < a.length; i++) {
-                a[i] = i * 1 + j;
-                b[i] = i * 1 - j;
-                c[i] = i + j;
-            }
+        for (int i = 0; i < a.length; i++) {
+           a[i] = (i%2) + 0x4099;
+           b[i] = (i%2) + 0x1033;
+           c[i] = (i%2) + 0x455;
         }
     }
 
+    public static void reductionInit2(
+            long[] a,
+            long[] b,
+            long[] c) {
+        for (int i = 0; i < a.length; i++) {
+           a[i] = 0x11;
+           b[i] = 0x12;
+           c[i] = 0x13;
+        }
+    }
+
+    // TODO why did original test specificy SSE >= 3 instead of >= 2?
+    @Test
+    @IR(applyIf = {"SuperWordReductions", "false"},
+        failOn = {IRNode.ADD_REDUCTION_V_L})
+    @IR(applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8",  "UseSSE", ">= 2"},
+        counts = {IRNode.ADD_REDUCTION_V_L, ">= 1"})
+    @IR(applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8",  "UseSVE", ">= 1"},
+        counts = {IRNode.ADD_REDUCTION_V_L, ">= 1"})
     public static long sumReductionImplement(
             long[] a,
             long[] b,
             long[] c,
-            long[] d,
-            long total) {
+            long[] d) {
+        long total = 0;
         for (int i = 0; i < a.length; i++) {
             d[i] = (a[i] * b[i]) + (a[i] * c[i]) + (b[i] * c[i]);
             total += d[i];
@@ -102,4 +160,97 @@ public class SumRed_Long {
         return total;
     }
 
+    @Test
+    @IR(applyIf = {"SuperWordReductions", "false"},
+        failOn = {IRNode.OR_REDUCTION_V})
+    @IR(applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSSE", ">= 3"},
+        counts = {IRNode.OR_REDUCTION_V, ">= 1"})
+    @IR(applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8",  "UseSVE", ">= 1"},
+        counts = {IRNode.OR_REDUCTION_V, ">= 1"})
+    public static long orReductionImplement(
+            long[] a,
+            long[] b,
+            long[] c,
+            long[] d) {
+        long total = 0;
+        for (int i = 0; i < a.length; i++) {
+            d[i] = (a[i] * b[i]) + (a[i] * c[i]) + (b[i] * c[i]);
+            total |= d[i];
+        }
+        return total;
+    }
+
+    @Test
+    @IR(applyIf = {"SuperWordReductions", "false"},
+        failOn = {IRNode.AND_REDUCTION_V})
+    @IR(applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSSE", ">= 3"},
+        counts = {IRNode.AND_REDUCTION_V, ">= 1"})
+    @IR(applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8",  "UseSVE", ">= 1"},
+        counts = {IRNode.ADD_REDUCTION_V, ">= 1"})
+    public static long andReductionImplement(
+            long[] a,
+            long[] b,
+            long[] c,
+            long[] d) {
+        long total = -1;
+        for (int i = 0; i < a.length; i++) {
+            d[i] = (a[i] * b[i]) + (a[i] * c[i]) + (b[i] * c[i]);
+            total &= d[i];
+        }
+        return total;
+    }
+
+    @Test
+    @IR(applyIf = {"SuperWordReductions", "false"},
+        failOn = {IRNode.XOR_REDUCTION_V})
+    @IR(applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSSE", ">= 3"},
+        counts = {IRNode.XOR_REDUCTION_V, ">= 1"})
+    @IR(applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSVE", ">= 1"},
+        counts = {IRNode.XOR_REDUCTION_V, ">= 1"})
+    public static long xorReductionImplement(
+            long[] a,
+            long[] b,
+            long[] c,
+            long[] d) {
+        long total = -1;
+        for (int i = 0; i < a.length; i++) {
+            d[i] = (a[i] * b[i]) + (a[i] * c[i]) + (b[i] * c[i]);
+            total ^= d[i];
+        }
+        return total;
+    }
+
+    // TODO why is "UseAVX" ==> supports_avx512dq() ?
+    @Test
+    @IR(applyIf = {"SuperWordReductions", "false"},
+        failOn = {IRNode.MUL_REDUCTION_V_L})
+    @IR(applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseAVX", ">= 3"},
+        counts = {IRNode.MUL_REDUCTION_V_L, ">= 1"})
+    // Not yet AArch64
+    public static long mulReductionImplement(
+            long[] a,
+            long[] b,
+            long[] c,
+            long[] d) {
+        long total = 1;
+        for (int i = 0; i < a.length; i++) {
+            d[i] = (a[i] * b[i]) + (a[i] * c[i]) + (b[i] * c[i]);
+            total = total*d[i];
+        }
+        return total;
+    }
+
+    public static void testCorrectness(
+            long total,
+            long valid,
+            String op) throws Exception {
+        if (total == valid) {
+            System.out.println(op + ": Success");
+        } else {
+            System.out.println("Invalid total: " + total);
+            System.out.println("Expected value = " + valid);
+            throw new Exception(op + ": Failed");
+        }
+    }
 }
+
