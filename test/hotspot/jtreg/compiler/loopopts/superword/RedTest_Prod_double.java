@@ -53,6 +53,8 @@ public class RedTest_Prod_double {
                 i++;
             }
         }
+        framework.addScenarios(scenarios);
+        framework.start();
     }
 
     @Run(test = {"prodReductionImplement"},
@@ -88,10 +90,10 @@ public class RedTest_Prod_double {
     @Test
     @IR(applyIfCPUFeature = {"ssse3", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
-        counts = {IRNode.ADD_REDUCTION_VD, ">= 1"})
+        counts = {IRNode.MUL_REDUCTION_VD, ">= 1"})
     @IR(applyIfCPUFeature = {"sve", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
-        counts = {IRNode.ADD_REDUCTION_VD, ">= 1"})
+        counts = {IRNode.MUL_REDUCTION_VD, ">= 1"})
     public static int prodReductionImplement(
             double[] a,
             double[] b,

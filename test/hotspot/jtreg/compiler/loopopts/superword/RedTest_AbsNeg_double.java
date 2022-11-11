@@ -56,6 +56,8 @@ public class RedTest_AbsNeg_double {
                 i++;
             }
         }
+        framework.addScenarios(scenarios);
+        framework.start();
     }
 
     @Run(test = {"sumReductionImplement"},

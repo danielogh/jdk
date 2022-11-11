@@ -54,7 +54,9 @@ public class RedTest_Sqrt_double {
                                                "-XX:LoopMaxUnroll=" + maxUnroll);
                 i++;
             }
-        }	
+	}
+        framework.addScenarios(scenarios);
+        framework.start();
     }
 
     @Run(test = {"sumReductionImplement"},

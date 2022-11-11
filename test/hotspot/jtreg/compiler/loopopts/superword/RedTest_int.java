@@ -47,12 +47,13 @@ public class RedTest_int {
         Scenario[] scenarios = new Scenario[8];
         for (String reductionSign : new String[] {"+", "-"}) {
             for (int maxUnroll : new int[] {2, 4, 8, 16}) {
-		// REMOVE
                 scenarios[i] = new Scenario(i, "-XX:" + reductionSign + "SuperWordReductions",
                                                "-XX:LoopMaxUnroll=" + maxUnroll);
                 i++;
             }
         }
+        framework.addScenarios(scenarios);
+        framework.start();
     }
 
     @Run(test = {"sumReductionImplement",
