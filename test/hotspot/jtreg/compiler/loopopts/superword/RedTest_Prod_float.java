@@ -40,13 +40,11 @@ public class RedTest_Prod_float {
         TestFramework framework = new TestFramework();
         framework.addFlags("-XX:+IgnoreUnrecognizedVMOptions",
                            "-XX:LoopUnrollLimit=250",
-                           "-XX:CompileThresholdScaling=0.1",
-                           "-XX:-TieredCompilation",
-                           "-XX:+RecomputeReductions");
+                           "-XX:CompileThresholdScaling=0.1");                           
         int i = 0;
         Scenario[] scenarios = new Scenario[8];
         for (String reductionSign : new String[] {"+", "-"}) {
-            for (float maxUnroll : new float[] {2, 4, 8, 16}) {
+            for (int maxUnroll : new int[] {2, 4, 8, 16}) {
 		// REMOVE
                 scenarios[i] = new Scenario(i, "-XX:" + reductionSign + "SuperWordReductions",
                                                "-XX:LoopMaxUnroll=" + maxUnroll);
@@ -66,12 +64,12 @@ public class RedTest_Prod_float {
         float[] d = new float[NUM];
         prodReductionInit(a, b, c);
         float total = 0;
-        float valid = 0;
+        float valid = 1;
         for (int j = 0; j < ITER; j++) {
             total = prodReductionImplement(a, b, c, d);
         }
         for (int j = 0; j < d.length; j++) {
-            valid += d[j];
+            valid *= d[j];
         }
         testCorrectness(total, valid, "Prod Float Reduction");
     }
@@ -99,9 +97,10 @@ public class RedTest_Prod_float {
             float[] b,
             float[] c,
             float[] d) {
-        float total = 0;
+        float total = 1;
         for (int i = 0; i < a.length; i++) {
-            total *= a[i] - b[i];
+	    d[i] = a[i] - b[i];
+            total *= d[i];
 	}
         return total;
     }

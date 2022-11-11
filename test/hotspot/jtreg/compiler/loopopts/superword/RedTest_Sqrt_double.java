@@ -43,8 +43,7 @@ public class RedTest_Sqrt_double {
         framework.addFlags("-XX:+IgnoreUnrecognizedVMOptions",
                            "-XX:LoopUnrollLimit=250",
                            "-XX:CompileThresholdScaling=0.1",
-                           "-XX:-TieredCompilation",
-                           "-XX:+RecomputeReductions");
+                           "-XX:-TieredCompilation");
         int i = 0;
         Scenario[] scenarios = new Scenario[8];
         for (String reductionSign : new String[] {"+", "-"}) {
@@ -70,9 +69,9 @@ public class RedTest_Sqrt_double {
         double total = 0;
         double valid = 0;
         for (int j = 0; j < ITER; j++) {
-            total = sumReductionImplement(a, b, c, d, total);
+            total = sumReductionImplement(a, b, c, d);
 	}
-	for (int j = 0; j < ITER; j++) {
+	for (int j = 0; j < d.length; j++) {
 	    valid += d[j];
 	}
 	testCorrectness(total, valid, "Sum Reduction Sqrt");
@@ -99,14 +98,14 @@ public class RedTest_Sqrt_double {
     @IR(applyIfCPUFeature = {"sve", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
         counts = {IRNode.ADD_REDUCTION_VD, ">= 1"})
-    @IR(applyIfAnd = {"SuperWordReductions", "false"},
-        counts = {IRNode.ADD_REDUCTION_VD, "== 0"})
+    @IR(applyIf = {"SuperWordReductions", "false"},
+        counts = {IRNode.ADD_REDUCTION_VD, "= 0"})
     public static double sumReductionImplement(
             double[] a,
             double[] b,
             double[] c,
-            double[] d,
-            double total) {
+            double[] d) {
+	double total = 0;
         for (int i = 0; i < a.length; i++) {
             d[i] = Math.sqrt(a[i] * b[i]) + Math.sqrt(a[i] * c[i]) + Math.sqrt(b[i] * c[i]);
             total += d[i];

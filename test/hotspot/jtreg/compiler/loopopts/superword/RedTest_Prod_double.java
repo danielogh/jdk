@@ -40,14 +40,11 @@ public class RedTest_Prod_double {
         TestFramework framework = new TestFramework();
         framework.addFlags("-XX:+IgnoreUnrecognizedVMOptions",
                            "-XX:LoopUnrollLimit=250",
-                           "-XX:CompileThresholdScaling=0.1",
-                           "-XX:-TieredCompilation",
-                           "-XX:+RecomputeReductions");
+                           "-XX:CompileThresholdScaling=0.1");
         int i = 0;
         Scenario[] scenarios = new Scenario[8];
         for (String reductionSign : new String[] {"+", "-"}) {
             for (int maxUnroll : new int[] {2, 4, 8, 16}) {
-		// REMOVE
                 scenarios[i] = new Scenario(i, "-XX:" + reductionSign + "SuperWordReductions",
                                                "-XX:LoopMaxUnroll=" + maxUnroll);
                 i++;
@@ -65,13 +62,13 @@ public class RedTest_Prod_double {
         double[] c = new double[NUM];
         double[] d = new double[NUM];
         prodReductionInit(a, b, c);
-        int total = 0;
-        int valid = 0;
+        double total = 0;
+        double valid = 1;
         for (int j = 0; j < ITER; j++) {
             total = prodReductionImplement(a, b, c, d);
         }
         for (int j = 0; j < d.length; j++) {
-            valid += d[j];
+            valid *= d[j];
         }
         testCorrectness(total, valid, "Prod Double Reduction");
     }
@@ -94,21 +91,22 @@ public class RedTest_Prod_double {
     @IR(applyIfCPUFeature = {"sve", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
         counts = {IRNode.MUL_REDUCTION_VD, ">= 1"})
-    public static int prodReductionImplement(
+    public static double prodReductionImplement(
             double[] a,
             double[] b,
             double[] c,
             double[] d) {
-        int total = 0;
+        double total = 1;
         for (int i = 0; i < a.length; i++) {
-            total *= a[i] - b[i];
+            d[i] = a[i] - b[i];
+            total *= d[i];
 	}
         return total;
     }
 
     public static void testCorrectness(
-            int total,
-            int valid,
+            double total,
+            double valid,
             String op) throws Exception {
         if (total == valid) {
             System.out.println(op + ": Success");
