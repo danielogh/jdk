@@ -142,7 +142,8 @@ public class RedTest_long_aarch64 {
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
         failOn = {IRNode.ADD_REDUCTION_V_L})
-    @IR(applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8",  "UseSVE", ">= 1"},
+    @IR(applyIfCPUFeature = {"sve", "true"},
+        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8",  "UseSVE", ">= 1"},
         counts = {IRNode.ADD_REDUCTION_V_L, ">= 1"})
     public static long sumReductionImplement(
             long[] a,
@@ -160,7 +161,8 @@ public class RedTest_long_aarch64 {
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
         failOn = {IRNode.OR_REDUCTION_V})
-    @IR(applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSVE", ">= 1"},
+    @IR(applyIfCPUFeature = {"sve", "true"},
+        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSVE", ">= 1"},
         counts = {IRNode.OR_REDUCTION_V, ">= 1"})
     public static long orReductionImplement(
             long[] a,
@@ -178,7 +180,8 @@ public class RedTest_long_aarch64 {
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
         failOn = {IRNode.AND_REDUCTION_V})
-    @IR(applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSVE", ">= 1"},
+    @IR(applyIfCPUFeature = {"sve", "true"},
+        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSVE", ">= 1"},
         counts = {IRNode.AND_REDUCTION_V, ">= 1"})
     public static long andReductionImplement(
             long[] a,
@@ -196,7 +199,8 @@ public class RedTest_long_aarch64 {
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
         failOn = {IRNode.XOR_REDUCTION_V})
-    @IR(applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSVE", ">= 1"},
+    @IR(applyIfCPUFeature = {"sve", "true"},
+        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSVE", ">= 1"},
         counts = {IRNode.XOR_REDUCTION_V, ">= 1"})
     public static long xorReductionImplement(
             long[] a,

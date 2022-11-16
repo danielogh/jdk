@@ -90,16 +90,15 @@ public class RedTest_Sqrt_double {
         }
     }
 
-    // TODO check if this is right
     @Test
+    @IR(applyIf = {"SuperWordReductions", "false"},
+        failOn = {IRNode.ADD_REDUCTION_VD})
     @IR(applyIfCPUFeature = {"sse", "true"},
-        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
+        applyIfAnd = {"SuperWordReductions", "true", "UseSSE", ">= 1", "LoopMaxUnroll", ">= 8"},
         counts = {IRNode.ADD_REDUCTION_VD, ">= 1"})
     @IR(applyIfCPUFeature = {"sve", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
         counts = {IRNode.ADD_REDUCTION_VD, ">= 1"})
-    @IR(applyIf = {"SuperWordReductions", "false"},
-        counts = {IRNode.ADD_REDUCTION_VD, "= 0"})
     public static double sumReductionImplement(
             double[] a,
             double[] b,

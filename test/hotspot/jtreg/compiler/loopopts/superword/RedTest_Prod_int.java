@@ -85,8 +85,10 @@ public class RedTest_Prod_int {
  
     // TODO
     @Test
-    @IR(applyIfCPUFeature = {"sse4", "true"},
-        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
+    @IR(applyIf = {"SuperWordReductions", "false"},
+        failOn = {IRNode.MUL_REDUCTION_V_I})
+    @IR(applyIfCPUFeature = {"sse4_1", "true"},
+        applyIfAnd = {"SuperWordReductions", "true", "UseSSE", ">= 4", "LoopMaxUnroll", ">= 8"},
         counts = {IRNode.MUL_REDUCTION_V_I, ">= 1"})
     @IR(applyIfCPUFeature = {"sve", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},

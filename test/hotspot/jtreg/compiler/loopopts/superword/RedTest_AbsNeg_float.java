@@ -26,11 +26,8 @@
  * @bug 8138583
  * @summary Add C2 AArch64 Superword support for scalar sum reduction optimizations : float abs & neg test
  * @library /test/lib /
- * @run driver compiler.loopopts.superword.RedTest_int
+ * @run driver compiler.loopopts.superword.RedTest_AbsNeg_float
 */
-
-// TODO why did we need  * @requires os.arch=="aarch64" | os.arch=="riscv64" ?
-// TODO check if that was in the original test directive
 
 package compiler.loopopts.superword;
 
@@ -38,15 +35,15 @@ import compiler.lib.ir_framework.*;
 
 public class RedTest_AbsNeg_float { 
 
-    static final int NUM = 256 * 1024;
-    static final int ITER = 8000;
+    static final int NUM = 1024; //TOOD : originally? 256 * 1024;
+    static final int ITER = 2000;
     public static void main(String[] args) throws Exception {
         TestFramework framework = new TestFramework();
         framework.addFlags("-XX:+IgnoreUnrecognizedVMOptions",
                            "-XX:LoopUnrollLimit=250",
                            "-XX:CompileThresholdScaling=0.1",
-                           "-XX:-TieredCompilation",
-                           "-XX:+RecomputeReductions");
+                           "-XX:-TieredCompilation");
+//                           "-XX:+RecomputeReductions");
         int i = 0;
         Scenario[] scenarios = new Scenario[8];
         for (String reductionSign : new String[] {"+", "-"}) {
@@ -73,7 +70,7 @@ public class RedTest_AbsNeg_float {
         float total = 0;
         float valid = 0;
         for (int j = 0; j < ITER; j++) {
-            total = sumReductionImplement(a, b, c, d, total);
+            total = sumReductionImplement(a, b, c, d);
         }
         for (int j = 0; j < d.length; j++) {
             valid += d[j];
@@ -95,8 +92,10 @@ public class RedTest_AbsNeg_float {
     }
 
     @Test
-    @IR(applyIfCPUFeature = {"sse1", "true"},
-        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
+    @IR(applyIf = {"SuperWordReductions", "false"},
+        failOn = {IRNode.ADD_REDUCTION_VF})
+    @IR(applyIfCPUFeature = {"sse", "true"},
+        applyIfAnd = {"SuperWordReductions", "true", "UseSSE", ">= 1", "LoopMaxUnroll", ">= 8"},
         counts = {IRNode.ADD_REDUCTION_VF, ">= 1"})
     @IR(applyIfCPUFeature = {"sve", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
@@ -105,8 +104,8 @@ public class RedTest_AbsNeg_float {
             float[] a,
             float[] b,
             float[] c,
-            float[] d,
-            float total) {
+            float[] d) {
+	float total = 0;
         for (int i = 0; i < a.length; i++) {
             d[i] = Math.abs(-a[i] * -b[i]) + Math.abs(-a[i] * -c[i]) + Math.abs(-b[i] * -c[i]);
             total += d[i];

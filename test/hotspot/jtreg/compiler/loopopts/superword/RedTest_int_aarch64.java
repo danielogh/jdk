@@ -143,7 +143,8 @@ public class RedTest_int_aarch64 {
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
         failOn = {IRNode.ADD_REDUCTION_V_I})
-    @IR(applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSVE", ">= 1"},
+    @IR(applyIfAnd = {applyIfCPUFeature = {"sve", "true"},
+        "SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSVE", ">= 1"},
         counts = {IRNode.ADD_REDUCTION_V_I, ">= 1"})
     public static int sumReductionImplement(
             int[] a,
@@ -161,7 +162,8 @@ public class RedTest_int_aarch64 {
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
         failOn = {IRNode.OR_REDUCTION_V})
-    @IR(applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSVE", ">= 1"},
+    @IR(applyIfAnd = {applyIfCPUFeature = {"sve", "true"},
+        "SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSVE", ">= 1"},
         counts = {IRNode.OR_REDUCTION_V, ">= 1"})
     public static int orReductionImplement(
             int[] a,
@@ -179,7 +181,8 @@ public class RedTest_int_aarch64 {
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
         failOn = {IRNode.AND_REDUCTION_V})
-    @IR(applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSVE", ">= 1"},
+    @IR(applyIfCPUFeature = {"sve", "true"},
+         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSVE", ">= 1"},
          counts = {IRNode.AND_REDUCTION_V, ">= 1"})
     public static int andReductionImplement(
             int[] a,
@@ -197,7 +200,8 @@ public class RedTest_int_aarch64 {
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
         failOn = {IRNode.XOR_REDUCTION_V})
-    @IR(applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSVE", ">= 1"},
+    @IR(applyIfCPUFeature = {"sve", "true"},
+        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSVE", ">= 1"},
         counts = {IRNode.XOR_REDUCTION_V, ">= 1"})
     public static int xorReductionImplement(
             int[] a,
