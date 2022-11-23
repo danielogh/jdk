@@ -141,10 +141,10 @@ public class RedTest_long_aarch64 {
 
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
-        failOn = {IRNode.ADD_REDUCTION_V_L})
+        failOn = {IRNode.ADD_REDUCTION_VL})
     @IR(applyIfCPUFeature = {"sve", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8",  "UseSVE", ">= 1"},
-        counts = {IRNode.ADD_REDUCTION_V_L, ">= 1"})
+        counts = {IRNode.ADD_REDUCTION_VL, ">= 1"})
     public static long sumReductionImplement(
             long[] a,
             long[] b,
@@ -217,7 +217,7 @@ public class RedTest_long_aarch64 {
 
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
-        failOn = {IRNode.MUL_REDUCTION_V_L})
+        failOn = {IRNode.MUL_REDUCTION_VL})
     public static long mulReductionImplement(
             long[] a,
             long[] b,

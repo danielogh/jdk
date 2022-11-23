@@ -142,10 +142,10 @@ public class RedTest_int_x64 {
 
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
-        failOn = {IRNode.ADD_REDUCTION_V_I})
+        failOn = {IRNode.ADD_REDUCTION_VI})
     @IR(applyIfCPUFeature = {"ssse3", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8",  "UseSSE", ">= 3"},
-        counts = {IRNode.ADD_REDUCTION_V_I, ">= 1"})
+        counts = {IRNode.ADD_REDUCTION_VI, ">= 1"})
     public static int sumReductionImplement(
             int[] a,
             int[] b,
@@ -218,10 +218,10 @@ public class RedTest_int_x64 {
 
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
-        failOn = {IRNode.MUL_REDUCTION_V_I})
+        failOn = {IRNode.MUL_REDUCTION_VI})
     @IR(applyIfCPUFeature = {"sse4_1", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSSE", ">= 4"},
-        counts = {IRNode.MUL_REDUCTION_V_I, ">= 1"})
+        counts = {IRNode.MUL_REDUCTION_VI, ">= 1"})
     public static int mulReductionImplement(
             int[] a,
             int[] b,

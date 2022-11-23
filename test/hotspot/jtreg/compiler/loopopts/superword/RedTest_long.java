@@ -142,13 +142,13 @@ public class RedTest_long_x64 {
     // TODO why did original test specificy SSE >= 3 instead of >= 2?
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
-        failOn = {IRNode.ADD_REDUCTION_V_L})
+        failOn = {IRNode.ADD_REDUCTION_VL})
     @IR(applyIfCPUFeature = {"sse4_1", "true"},
-        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8",  "UseSSE", ">= 2"},
-        counts = {IRNode.ADD_REDUCTION_V_L, ">= 1"})
+        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSSE", ">= 2"},
+        counts = {IRNode.ADD_REDUCTION_VL, ">= 1"})
     @IR(applyIfCPUFeature = {"sve", "true"},
-        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
-        counts = {IRNode.ADD_REDUCTION_V_L, ">= 1"})
+        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSVE", ">= 1"},
+        counts = {IRNode.ADD_REDUCTION_VL, ">= 1"})
     public static long sumReductionImplement(
             long[] a,
             long[] b,
@@ -169,7 +169,7 @@ public class RedTest_long_x64 {
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSSE", ">= 3"},
         counts = {IRNode.OR_REDUCTION_V, ">= 1"})
     @IR(applyIfCPUFeature = {"sve", "true"},
-        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
+        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSVE", ">= 1"},
         counts = {IRNode.OR_REDUCTION_V, ">= 1"})
     public static long orReductionImplement(
             long[] a,
@@ -191,7 +191,7 @@ public class RedTest_long_x64 {
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSSE", ">= 3"},
         counts = {IRNode.AND_REDUCTION_V, ">= 1"})
     @IR(applyIfCPUFeature = {"sve", "true"},
-        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
+        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSVE", ">= 1"},
         counts = {IRNode.ADD_REDUCTION_V, ">= 1"})
     public static long andReductionImplement(
             long[] a,
@@ -213,7 +213,7 @@ public class RedTest_long_x64 {
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSSE", ">= 3"},
         counts = {IRNode.XOR_REDUCTION_V, ">= 1"})
     @IR(applIfCPUFeature = {"sve", "true"},
-        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
+        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSVE", ">= 1"},
         counts = {IRNode.XOR_REDUCTION_V, ">= 1"})
     public static long xorReductionImplement(
             long[] a,
@@ -228,13 +228,13 @@ public class RedTest_long_x64 {
         return total;
     }
 
-    // TODO why is "UseAVX" ==> supports_avx512dq() ?
+
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
-        failOn = {IRNode.MUL_REDUCTION_V_L})
-    @IR(applIfCPUFeature({"avx512dq", true}),
+        failOn = {IRNode.MUL_REDUCTION_VL})
+    @IR(applyIfCPUFeature = {"avx512dq", true},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseAVX", ">= 3"},
-        counts = {IRNode.MUL_REDUCTION_V_L, ">= 1"})
+        counts = {IRNode.MUL_REDUCTION_VL, ">= 1"})
     // Not yet AArch64
     public static long mulReductionImplement(
             long[] a,

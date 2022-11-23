@@ -35,7 +35,7 @@ import compiler.lib.ir_framework.*;
 
 public class RedTest_AbsNeg_double { 
 
-    static final int NUM = 1024; //TODO: originally ? 256 * 1024;
+    static final int NUM = 256 * 1024;
     static final int ITER = 2000;
     public static void main(String[] args) throws Exception {
         TestFramework framework = new TestFramework();
@@ -43,7 +43,6 @@ public class RedTest_AbsNeg_double {
                            "-XX:LoopUnrollLimit=250",
                            "-XX:CompileThresholdScaling=0.1",
                            "-XX:-TieredCompilation");
-//                           "-XX:+RecomputeReductions");
         int i = 0;
         Scenario[] scenarios = new Scenario[8];
         for (String reductionSign : new String[] {"+", "-"}) {
@@ -98,7 +97,7 @@ public class RedTest_AbsNeg_double {
         applyIfAnd = {"SuperWordReductions", "true", "UseSSE", ">= 1", "LoopMaxUnroll", ">= 8"},
         counts = {IRNode.ADD_REDUCTION_VD, ">= 1"})
     @IR(applyIfCPUFeature = {"sve", "true"},
-        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
+        applyIfAnd = {"SuperWordReductions", "true", "UseSVE", ">= 1", "LoopMaxUnroll", ">= 8"},
         counts = {IRNode.ADD_REDUCTION_VD, ">= 1"})
     public static double sumReductionImplement(
             double[] a,
