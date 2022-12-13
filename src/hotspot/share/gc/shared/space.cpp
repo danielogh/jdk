@@ -161,12 +161,6 @@ void DirtyCardToOopClosure::do_MemRegion(MemRegion mr) {
   _min_done = bottom;
 }
 
-DirtyCardToOopClosure* Space::new_dcto_cl(OopIterateClosure* cl,
-                                          CardTable::PrecisionStyle precision,
-                                          HeapWord* boundary) {
-  return new DirtyCardToOopClosure(this, cl, precision, boundary);
-}
-
 HeapWord* ContiguousSpaceDCTOC::get_actual_top(HeapWord* top,
                                                HeapWord* top_obj) {
   if (top_obj != NULL && top_obj < (_sp->toContiguousSpace())->top()) {
@@ -189,9 +183,9 @@ HeapWord* ContiguousSpaceDCTOC::get_actual_top(HeapWord* top,
   return top;
 }
 
-void FilteringDCTOC::walk_mem_region(MemRegion mr,
-                                     HeapWord* bottom,
-                                     HeapWord* top) {
+void ContiguousSpaceDCTOC::walk_mem_region(MemRegion mr,
+                                           HeapWord* bottom,
+                                           HeapWord* top) {
   // Note that this assumption won't hold if we have a concurrent
   // collector in this space, which may have freed up objects after
   // they were dirtied and before the stop-the-world GC that is
