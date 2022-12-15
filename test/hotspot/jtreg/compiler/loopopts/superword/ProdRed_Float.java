@@ -26,63 +26,45 @@
  * @bug 8074981
  * @summary Add C2 x86 Superword support for scalar product reduction optimizations : float test
  * @requires os.arch=="x86" | os.arch=="i386" | os.arch=="amd64" | os.arch=="x86_64" | os.arch=="aarch64" | os.arch=="riscv64"
- *
- * @run main/othervm -XX:+IgnoreUnrecognizedVMOptions -XX:LoopUnrollLimit=250
- *      -XX:CompileThresholdScaling=0.1
- *      -XX:+SuperWordReductions
- *      -XX:LoopMaxUnroll=2
- *      compiler.loopopts.superword.ProdRed_Float
- * @run main/othervm -XX:+IgnoreUnrecognizedVMOptions -XX:LoopUnrollLimit=250
- *      -XX:CompileThresholdScaling=0.1
- *      -XX:-SuperWordReductions
- *      -XX:LoopMaxUnroll=2
- *      compiler.loopopts.superword.ProdRed_Float
- *
- * @run main/othervm -XX:+IgnoreUnrecognizedVMOptions -XX:LoopUnrollLimit=250
- *      -XX:CompileThresholdScaling=0.1
- *      -XX:+SuperWordReductions
- *      -XX:LoopMaxUnroll=4
- *      compiler.loopopts.superword.ProdRed_Float
- * @run main/othervm -XX:+IgnoreUnrecognizedVMOptions -XX:LoopUnrollLimit=250
- *      -XX:CompileThresholdScaling=0.1
- *      -XX:-SuperWordReductions
- *      -XX:LoopMaxUnroll=4
- *      compiler.loopopts.superword.ProdRed_Float
- *
- * @run main/othervm -XX:+IgnoreUnrecognizedVMOptions -XX:LoopUnrollLimit=250
- *      -XX:CompileThresholdScaling=0.1
- *      -XX:+SuperWordReductions
- *      -XX:LoopMaxUnroll=8
- *      compiler.loopopts.superword.ProdRed_Float
- * @run main/othervm -XX:+IgnoreUnrecognizedVMOptions -XX:LoopUnrollLimit=250
- *      -XX:CompileThresholdScaling=0.1
- *      -XX:-SuperWordReductions
- *      -XX:LoopMaxUnroll=8
- *      compiler.loopopts.superword.ProdRed_Float
- *
- * @run main/othervm -XX:+IgnoreUnrecognizedVMOptions -XX:LoopUnrollLimit=250
- *      -XX:CompileThresholdScaling=0.1
- *      -XX:+SuperWordReductions
- *      -XX:LoopMaxUnroll=16
- *      compiler.loopopts.superword.ProdRed_Float
- * @run main/othervm -XX:+IgnoreUnrecognizedVMOptions -XX:LoopUnrollLimit=250
- *      -XX:CompileThresholdScaling=0.1
- *      -XX:-SuperWordReductions
- *      -XX:LoopMaxUnroll=16
- *      compiler.loopopts.superword.ProdRed_Float
+ * @library /test/lib /
+ * @run driver compiler.loopopts.superword.ProdRed_Float
  */
 
 package compiler.loopopts.superword;
 
+import compiler.lib.ir_framework.*;
+
 public class ProdRed_Float {
+    static final int NUM = 256 * 1024;
+    static final int ITER = 2000;
     public static void main(String[] args) throws Exception {
-        float[] a = new float[256 * 1024];
-        float[] b = new float[256 * 1024];
+        TestFramework framework = new TestFramework();
+        framework.addFlags("-XX:+IgnoreUnrecognizedVMOptions",
+                           "-XX:LoopUnrollLimit=250",
+                           "-XX:CompileThresholdScaling=0.1");
+        int i = 0;
+        Scenario[] scenarios = new Scenario[8];
+        for (String reductionSign : new String[] {"+", "-"}) {
+            for (int maxUnroll : new int[] {2, 4, 8, 16}) {
+                scenarios[i] = new Scenario(i, "-XX:" + reductionSign + "SuperWordReductions",
+                                               "-XX:LoopMaxUnroll=" + maxUnroll);
+                i++;
+            }
+        }
+        framework.addScenarios(scenarios);
+        framework.start();
+    }
+
+    @Run(test = {"prodReductionImplement"},
+        mode = RunMode.STANDALONE)
+    public void runTests() throws Exception {
+        float[] a = new float[NUM];
+        float[] b = new float[NUM];
         prodReductionInit(a, b);
         float valid = 2000;
-        float total = 0;
-        for (int j = 0; j < 2000; j++) {
-            total = j + 1;
+	float total = 0;
+        for (int j = 0; j < ITER; j++) {
+	    total = j + 1;
             total = prodReductionImplement(a, b, total);
         }
         if (total == valid) {
@@ -101,6 +83,12 @@ public class ProdRed_Float {
         }
     }
 
+    @Test
+    @IR(applyIf = {"SuperWordReductions", "false"},
+        failOn = {IRNode.MUL_REDUCTION_VF})
+    @IR(applyIfCPUFeature = {"sse", "true"},
+        applyIfAnd = {"SuperWordReductions", "true", "UseSSE", ">= 1", "LoopMaxUnroll", ">= 8"},
+        counts = {IRNode.MUL_REDUCTION_VF, ">= 1"})
     public static float prodReductionImplement(float[] a, float[] b, float total) {
         for (int i = 0; i < a.length; i++) {
             total *= a[i] - b[i];

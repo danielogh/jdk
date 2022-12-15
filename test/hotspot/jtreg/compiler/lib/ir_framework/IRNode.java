@@ -673,6 +673,11 @@ public class IRNode {
         superWordNodes(MUL_REDUCTION_VF, "MulReductionVF");
     }
 
+    public static final String MUL_REDUCTION_VI = PREFIX + "MUL_REDUCTION_VI" + POSTFIX;
+    static {
+	superWordNodes(MUL_REDUCTION_VI, "MulReductionVI");
+    }
+
     public static final String NULL_ASSERT_TRAP = PREFIX + "NULL_ASSERT_TRAP" + POSTFIX;
     static {
         trapNodes(NULL_ASSERT_TRAP,"null_assert");
