@@ -25,62 +25,44 @@
  * @test
  * @bug 8240248
  * @summary Add C2 x86 Superword support for scalar logical reduction optimizations : long test
- *
- * @run main/othervm -XX:+IgnoreUnrecognizedVMOptions -XX:LoopUnrollLimit=250
- *      -XX:CompileThresholdScaling=0.1
- *      -XX:-TieredCompilation
- *      -XX:+SuperWordReductions
- *      -XX:LoopMaxUnroll=2
- *      compiler.loopopts.superword.RedTest_long
- * @run main/othervm -XX:+IgnoreUnrecognizedVMOptions -XX:LoopUnrollLimit=250
- *      -XX:CompileThresholdScaling=0.1
- *      -XX:-SuperWordReductions
- *      -XX:LoopMaxUnroll=2
- *      compiler.loopopts.superword.RedTest_long
- *
- * @run main/othervm -XX:+IgnoreUnrecognizedVMOptions -XX:LoopUnrollLimit=250
- *      -XX:CompileThresholdScaling=0.1
- *      -XX:-TieredCompilation
- *      -XX:+SuperWordReductions
- *      -XX:LoopMaxUnroll=4
- *      compiler.loopopts.superword.RedTest_long
- * @run main/othervm -XX:+IgnoreUnrecognizedVMOptions -XX:LoopUnrollLimit=250
- *      -XX:CompileThresholdScaling=0.1
- *      -XX:-SuperWordReductions
- *      -XX:LoopMaxUnroll=4
- *      compiler.loopopts.superword.RedTest_long
- *
- * @run main/othervm -XX:+IgnoreUnrecognizedVMOptions -XX:LoopUnrollLimit=250
- *      -XX:CompileThresholdScaling=0.1
- *      -XX:-TieredCompilation
- *      -XX:+SuperWordReductions
- *      -XX:LoopMaxUnroll=8
- *      compiler.loopopts.superword.RedTest_long
- * @run main/othervm -XX:+IgnoreUnrecognizedVMOptions -XX:LoopUnrollLimit=250
- *      -XX:CompileThresholdScaling=0.1
- *      -XX:-SuperWordReductions
- *      -XX:LoopMaxUnroll=8
- *      compiler.loopopts.superword.RedTest_long
- *
- * @run main/othervm -XX:+IgnoreUnrecognizedVMOptions -XX:LoopUnrollLimit=250
- *      -XX:CompileThresholdScaling=0.1
- *      -XX:-TieredCompilation
- *      -XX:+SuperWordReductions
- *      -XX:LoopMaxUnroll=16
- *      compiler.loopopts.superword.RedTest_long
- * @run main/othervm -XX:+IgnoreUnrecognizedVMOptions -XX:LoopUnrollLimit=250
- *      -XX:CompileThresholdScaling=0.1
- *      -XX:-SuperWordReductions
- *      -XX:LoopMaxUnroll=16
- *      compiler.loopopts.superword.RedTest_long
+ * @library /test/lib /
+ * @run driver compiler.loopopts.superword.RedTest_long
  */
 
 package compiler.loopopts.superword;
+
+import compiler.lib.ir_framework.*;
 
 public class RedTest_long {
     static final int NUM = 512;
     static final int ITER = 8000;
     public static void main(String[] args) throws Exception {
+        TestFramework framework = new TestFramework();
+        framework.addFlags("-XX:+IgnoreUnrecognizedVMOptions",
+                           "-XX:LoopUnrollLimit=250",
+                           "-XX:CompileThresholdScaling=0.1",
+                           "-XX:-TieredCompilation",
+                           "-XX:+RecomputeReductions");
+        int i = 0;
+        Scenario[] scenarios = new Scenario[8];
+        for (String reductionSign : new String[] {"+", "-"}) {
+            for (int maxUnroll : new int[] {2, 4, 8, 16}) {
+                scenarios[i] = new Scenario(i, "-XX:" + reductionSign + "SuperWordReductions",
+                                               "-XX:LoopMaxUnroll=" + maxUnroll);
+                i++;
+            }
+        }
+        framework.addScenarios(scenarios);
+        framework.start();
+    }
+
+    @Run(test = {"sumReductionImplement",
+                 "orReductionImplement",
+                 "andReductionImplement",
+                 "xorReductionImplement",
+                 "mulReductionImplement"},
+        mode = RunMode.STANDALONE)
+    public static void runTests() throws Exception {
         long[] a = new long[NUM];
         long[] b = new long[NUM];
         long[] c = new long[NUM];
@@ -156,7 +138,12 @@ public class RedTest_long {
         }
     }
 
-
+    @Test
+    @IR(applyIf = {"SuperWordReductions", "false"},
+        failOn = {IRNode.ADD_REDUCTION_VL})
+    @IR(applyIfCPUFeature = {"sse4_1", "true"},
+        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSSE", ">= 2"},
+        counts = {IRNode.ADD_REDUCTION_VL, ">= 1"})
     public static long sumReductionImplement(
             long[] a,
             long[] b,
@@ -170,6 +157,12 @@ public class RedTest_long {
         return total;
     }
 
+    @Test
+    @IR(applyIf = {"SuperWordReductions", "false"},
+        failOn = {IRNode.OR_REDUCTION_V})
+    @IR(applyIfCPUFeature = {"sse4_1", "true"},
+        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSSE", ">= 3"},
+        counts = {IRNode.OR_REDUCTION_V, ">= 1"})
     public static long orReductionImplement(
             long[] a,
             long[] b,
@@ -183,6 +176,12 @@ public class RedTest_long {
         return total;
     }
 
+    @Test
+    @IR(applyIf = {"SuperWordReductions", "false"},
+        failOn = {IRNode.AND_REDUCTION_V})
+    @IR(applyIfCPUFeature = {"sse4_1", "true"},
+        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSSE", ">= 3"},
+        counts = {IRNode.AND_REDUCTION_V, ">= 1"})
     public static long andReductionImplement(
             long[] a,
             long[] b,
@@ -196,6 +195,12 @@ public class RedTest_long {
         return total;
     }
 
+    @Test
+    @IR(applyIf = {"SuperWordReductions", "false"},
+        failOn = {IRNode.XOR_REDUCTION_V})
+    @IR(applyIfCPUFeature = {"sse4_1", "true"},
+        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSSE", ">= 3"},
+        counts = {IRNode.XOR_REDUCTION_V, ">= 1"})
     public static long xorReductionImplement(
             long[] a,
             long[] b,
@@ -209,6 +214,14 @@ public class RedTest_long {
         return total;
     }
 
+
+    @Test
+    @IR(applyIf = {"SuperWordReductions", "false"},
+        failOn = {IRNode.MUL_REDUCTION_VL})
+    @IR(applyIfCPUFeature = {"avx512dq", "true"},
+        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseAVX", ">= 3"},
+        counts = {IRNode.MUL_REDUCTION_VL, ">= 1"})
+    // Not yet AArch64
     public static long mulReductionImplement(
             long[] a,
             long[] b,
