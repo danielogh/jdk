@@ -35,8 +35,6 @@ package compiler.loopopts.superword;
 import compiler.lib.ir_framework.*;
 
 public class ProdRed_Int {
-    static final int NUM = 256 * 1024;
-    static final int ITER = 2000;
     public static void main(String[] args) throws Exception {
         TestFramework framework = new TestFramework();
         framework.addFlags("-XX:+IgnoreUnrecognizedVMOptions",
@@ -58,12 +56,12 @@ public class ProdRed_Int {
     @Run(test = {"prodReductionImplement"},
         mode = RunMode.STANDALONE)
     public void runTests() throws Exception {
-        int[] a = new int[NUM];
-        int[] b = new int[NUM];
+        int[] a = new int[256 * 1024];
+        int[] b = new int[256 * 1024];
         prodReductionInit(a, b);
         int valid = 419430401;
-	int total = 1;
-        for (int j = 0; j < ITER; j++) {
+        int total = 1;
+        for (int j = 0; j < 2000; j++) {
             total = prodReductionImplement(a, b, total);
         }
         if (total == valid) {
@@ -85,8 +83,8 @@ public class ProdRed_Int {
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
         failOn = {IRNode.MUL_REDUCTION_VI})
-    @IR(applyIfCPUFeature = {"sse", "true"},
-        applyIfAnd = {"SuperWordReductions", "true", "UseSSE", ">= 1", "LoopMaxUnroll", ">= 8"},
+    @IR(applyIfCPUFeature = {"sse4_1", "true"},
+        applyIfAnd = {"SuperWordReductions", "true", "UseSSE", ">= 4", "LoopMaxUnroll", ">= 8"},
         counts = {IRNode.MUL_REDUCTION_VI, ">= 1"})
     public static int prodReductionImplement(int[] a, int[] b, int total) {
         for (int i = 0; i < a.length; i++) {

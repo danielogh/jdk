@@ -24,7 +24,7 @@
 /**
  * @test
  * @bug 8074981
- * @summary Add C2 x86 Superword support for scalar product reduction optimizations : double test
+ * @summary Add C2 x86 Superword support for scalar product reduction optimizations : float test
  * @requires os.arch=="x86" | os.arch=="i386" | os.arch=="amd64" | os.arch=="x86_64" | os.arch=="aarch64" | os.arch=="riscv64"
  * @library /test/lib /
  * @run driver compiler.loopopts.superword.ProdRed_Double
@@ -35,8 +35,6 @@ package compiler.loopopts.superword;
 import compiler.lib.ir_framework.*;
 
 public class ProdRed_Double {
-    static final int NUM = 256 * 1024;
-    static final int ITER = 2000;
     public static void main(String[] args) throws Exception {
         TestFramework framework = new TestFramework();
         framework.addFlags("-XX:+IgnoreUnrecognizedVMOptions",
@@ -58,13 +56,13 @@ public class ProdRed_Double {
     @Run(test = {"prodReductionImplement"},
         mode = RunMode.STANDALONE)
     public void runTests() throws Exception {
-        double[] a = new double[NUM];
-        double[] b = new double[NUM];
+        double[] a = new double[256 * 1024];
+        double[] b = new double[256 * 1024];
         prodReductionInit(a, b);
         double valid = 2000;
-	double total = 0;
-        for (int j = 0; j < ITER; j++) {
-	    total = j + 1;
+        double total = 0;
+        for (int j = 0; j < 2000; j++) {
+            total = j + 1;
             total = prodReductionImplement(a, b, total);
         }
         if (total == valid) {
@@ -83,14 +81,15 @@ public class ProdRed_Double {
         }
     }
 
+    // Reduction nodes not emitted for this test.
+    //@IR(applyIfCPUFeature = {"sse", "true"},
+    //    applyIfAnd = {"SuperWordReductions", "true", "UseSSE", ">= 1", "LoopMaxUnroll", ">= 8"},
+    //    counts = {IRNode.MUL_REDUCTION_VD, ">= 1"})
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
         failOn = {IRNode.MUL_REDUCTION_VD})
-    @IR(applyIfCPUFeature = {"sse", "true"},
-        applyIfAnd = {"SuperWordReductions", "true", "UseSSE", ">= 1", "LoopMaxUnroll", ">= 8"},
-        counts = {IRNode.MUL_REDUCTION_VD, ">= 1"})
     public static double prodReductionImplement(double[] a, double[] b, double total) {
-	for (int i = 0; i < a.length; i++) {
+        for (int i = 0; i < a.length; i++) {
             total *= a[i] - b[i];
         }
         return total;

@@ -35,13 +35,12 @@ package compiler.loopopts.superword;
 import compiler.lib.ir_framework.*;
 
 public class SumRed_Float {
-   public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
         TestFramework framework = new TestFramework();
         framework.addFlags("-XX:+IgnoreUnrecognizedVMOptions",
                            "-XX:LoopUnrollLimit=250",
                            "-XX:CompileThresholdScaling=0.1",
-                           "-XX:-TieredCompilation",
-                           "-XX:+RecomputeReductions");
+                           "-XX:-TieredCompilation");
         int i = 0;
         Scenario[] scenarios = new Scenario[8];
         for (String reductionSign : new String[] {"+", "-"}) {
@@ -93,8 +92,8 @@ public class SumRed_Float {
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
         failOn = {IRNode.ADD_REDUCTION_VF})
-    @IR(applyIfCPUFeature = {"ssse3", "true"},
-        applyIfAnd = {"SuperWordReductions", "true", "UseSSE", ">= 3", "LoopMaxUnroll", ">= 8"},
+    @IR(applyIfCPUFeature = {"sse", "true"},
+        applyIfAnd = {"SuperWordReductions", "true", "UseSSE", ">= 1", "LoopMaxUnroll", ">= 8"},
         counts = {IRNode.ADD_REDUCTION_VF, ">= 1"})
     public static float sumReductionImplement(
             float[] a,

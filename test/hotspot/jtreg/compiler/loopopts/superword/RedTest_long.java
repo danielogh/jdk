@@ -138,10 +138,11 @@ public class RedTest_long {
         }
     }
 
+
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
         failOn = {IRNode.ADD_REDUCTION_VL})
-    @IR(applyIfCPUFeature = {"sse4_1", "true"},
+    @IR(applyIfCPUFeature = {"sse2", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSSE", ">= 2"},
         counts = {IRNode.ADD_REDUCTION_VL, ">= 1"})
     public static long sumReductionImplement(
@@ -160,7 +161,7 @@ public class RedTest_long {
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
         failOn = {IRNode.OR_REDUCTION_V})
-    @IR(applyIfCPUFeature = {"sse4_1", "true"},
+    @IR(applyIfCPUFeature = {"ssse3", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSSE", ">= 3"},
         counts = {IRNode.OR_REDUCTION_V, ">= 1"})
     public static long orReductionImplement(
@@ -179,7 +180,7 @@ public class RedTest_long {
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
         failOn = {IRNode.AND_REDUCTION_V})
-    @IR(applyIfCPUFeature = {"sse4_1", "true"},
+    @IR(applyIfCPUFeature = {"ssse3", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSSE", ">= 3"},
         counts = {IRNode.AND_REDUCTION_V, ">= 1"})
     public static long andReductionImplement(
@@ -198,7 +199,7 @@ public class RedTest_long {
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
         failOn = {IRNode.XOR_REDUCTION_V})
-    @IR(applyIfCPUFeature = {"sse4_1", "true"},
+    @IR(applyIfCPUFeature = {"ssse3", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseSSE", ">= 3"},
         counts = {IRNode.XOR_REDUCTION_V, ">= 1"})
     public static long xorReductionImplement(

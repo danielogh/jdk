@@ -25,6 +25,7 @@
  * @test
  * @bug 8135028
  * @summary Add C2 x86 Superword support for scalar sum reduction optimizations : double sqrt test
+ * @requires os.arch=="x86" | os.arch=="i386" | os.arch=="amd64" | os.arch=="x86_64" | os.arch=="aarch64" | os.arch=="riscv64"
  * @library /test/lib /
  * @run driver compiler.loopopts.superword.SumRedSqrt_Double
  */
@@ -34,8 +35,6 @@ package compiler.loopopts.superword;
 import compiler.lib.ir_framework.*;
 
 public class SumRedSqrt_Double {
-    static final int NUM = 256 * 1024;
-    static final int ITER = 2000;
     public static void main(String[] args) throws Exception {
 
         TestFramework framework = new TestFramework();
@@ -63,7 +62,7 @@ public class SumRedSqrt_Double {
         double[] b = new double[256 * 1024];
         double[] c = new double[256 * 1024];
         double[] d = new double[256 * 1024];
-	sumReductionInit(a, b, c);
+        sumReductionInit(a, b, c);
         double total = 0;
         double valid = 2.06157643776E14;
         for (int j = 0; j < 2000; j++) {

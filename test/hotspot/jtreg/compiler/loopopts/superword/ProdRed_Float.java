@@ -35,8 +35,6 @@ package compiler.loopopts.superword;
 import compiler.lib.ir_framework.*;
 
 public class ProdRed_Float {
-    static final int NUM = 256 * 1024;
-    static final int ITER = 2000;
     public static void main(String[] args) throws Exception {
         TestFramework framework = new TestFramework();
         framework.addFlags("-XX:+IgnoreUnrecognizedVMOptions",
@@ -58,13 +56,13 @@ public class ProdRed_Float {
     @Run(test = {"prodReductionImplement"},
         mode = RunMode.STANDALONE)
     public void runTests() throws Exception {
-        float[] a = new float[NUM];
-        float[] b = new float[NUM];
+        float[] a = new float[256 * 1024];
+        float[] b = new float[256 * 1024];
         prodReductionInit(a, b);
         float valid = 2000;
-	float total = 0;
-        for (int j = 0; j < ITER; j++) {
-	    total = j + 1;
+        float total = 0;
+        for (int j = 0; j < 2000; j++) {
+            total = j + 1;
             total = prodReductionImplement(a, b, total);
         }
         if (total == valid) {

@@ -35,7 +35,7 @@ package compiler.loopopts.superword;
 import compiler.lib.ir_framework.*;
 
 public class SumRed_Int {
-   public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
         TestFramework framework = new TestFramework();
         framework.addFlags("-XX:+IgnoreUnrecognizedVMOptions",
                            "-XX:LoopUnrollLimit=250",

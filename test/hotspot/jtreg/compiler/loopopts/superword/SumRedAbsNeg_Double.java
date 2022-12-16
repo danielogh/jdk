@@ -25,15 +25,16 @@
  * @test
  * @bug 8138583
  * @summary Add C2 AArch64 Superword support for scalar sum reduction optimizations : double abs & neg test
+ * @requires os.arch=="aarch64" | os.arch=="riscv64"
  * @library /test/lib /
  * @run driver compiler.loopopts.superword.SumRedAbsNeg_Double
-*/
+ */
 
 package compiler.loopopts.superword;
 
 import compiler.lib.ir_framework.*;
 
-public class SumRedAbsNeg_Double { 
+public class SumRedAbsNeg_Double {
     public static void main(String[] args) throws Exception {
         TestFramework framework = new TestFramework();
         framework.addFlags("-XX:+IgnoreUnrecognizedVMOptions",
@@ -68,6 +69,7 @@ public class SumRedAbsNeg_Double {
         for (int j = 0; j < 2000; j++) {
             total = sumReductionImplement(a, b, c, d, total);
         }
+
         if (total == valid) {
             System.out.println("Success");
         } else {
@@ -75,7 +77,6 @@ public class SumRedAbsNeg_Double {
             System.out.println("Expected value = " + valid);
             throw new Exception("Failed");
         }
-
     }
 
     public static void sumReductionInit(
@@ -93,10 +94,7 @@ public class SumRedAbsNeg_Double {
 
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
-        failOn = {IRNode.ADD_REDUCTION_VF})
-    @IR(applyIfCPUFeature = {"sse", "true"},
-        applyIfAnd = {"SuperWordReductions", "true", "UseSSE", ">= 1", "LoopMaxUnroll", ">= 8"},
-        counts = {IRNode.ADD_REDUCTION_VD, ">= 1"})
+        failOn = {IRNode.ADD_REDUCTION_VD})
     public static double sumReductionImplement(
             double[] a,
             double[] b,

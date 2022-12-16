@@ -25,15 +25,16 @@
  * @test
  * @bug 8138583
  * @summary Add C2 AArch64 Superword support for scalar sum reduction optimizations : float abs & neg test
+ * @requires os.arch=="aarch64" | os.arch=="riscv64"
  * @library /test/lib /
  * @run driver compiler.loopopts.superword.SumRedAbsNeg_Float
-*/
+ */
 
 package compiler.loopopts.superword;
 
 import compiler.lib.ir_framework.*;
 
-public class SumRedAbsNeg_Float { 
+public class SumRedAbsNeg_Float {
     public static void main(String[] args) throws Exception {
         TestFramework framework = new TestFramework();
         framework.addFlags("-XX:+IgnoreUnrecognizedVMOptions",
@@ -44,7 +45,6 @@ public class SumRedAbsNeg_Float {
         Scenario[] scenarios = new Scenario[8];
         for (String reductionSign : new String[] {"+", "-"}) {
             for (int maxUnroll : new int[] {2, 4, 8, 16}) {
-                // REMOVE
                 scenarios[i] = new Scenario(i, "-XX:" + reductionSign + "SuperWordReductions",
 				               "-XX:LoopUnrollLimit=" + 250,
                                                "-XX:LoopMaxUnroll=" + maxUnroll);
@@ -63,20 +63,22 @@ public class SumRedAbsNeg_Float {
         float[] c = new float[256 * 1024];
         float[] d = new float[256 * 1024];
         sumReductionInit(a, b, c);
-	float total = 0;
+        float total = 0;
         float valid = (float) 4.611686E18;
+
         for (int j = 0; j < 2000; j++) {
             total = sumReductionImplement(a, b, c, d, total);
         }
+
         if (total == valid) {
             System.out.println("Success");
         } else {
             System.out.println("Invalid sum of elements variable in total: " + total);
             System.out.println("Expected value = " + valid);
             throw new Exception("Failed");
-	}
+        }
     }
- 	
+
     public static void sumReductionInit(
             float[] a,
             float[] b,
@@ -93,9 +95,6 @@ public class SumRedAbsNeg_Float {
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
         failOn = {IRNode.ADD_REDUCTION_VF})
-    @IR(applyIfCPUFeature = {"sse", "true"},
-        applyIfAnd = {"SuperWordReductions", "true", "UseSSE", ">= 1", "LoopMaxUnroll", ">= 8"},
-        counts = {IRNode.ADD_REDUCTION_VF, ">= 1"})
     public static float sumReductionImplement(
             float[] a,
             float[] b,

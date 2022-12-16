@@ -35,7 +35,7 @@ package compiler.loopopts.superword;
 import compiler.lib.ir_framework.*;
 
 public class SumRed_Long {
-   public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
         TestFramework framework = new TestFramework();
         framework.addFlags("-XX:+IgnoreUnrecognizedVMOptions",
                            "-XX:LoopUnrollLimit=250",
@@ -93,7 +93,7 @@ public class SumRed_Long {
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
         failOn = {IRNode.ADD_REDUCTION_VL})
-    @IR(applyIfCPUFeature = {"ssse2", "true"},
+    @IR(applyIfCPUFeature = {"sse2", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "UseSSE", ">= 2", "LoopMaxUnroll", ">= 8"},
         counts = {IRNode.ADD_REDUCTION_VL, ">= 1"})
     public static long sumReductionImplement(
