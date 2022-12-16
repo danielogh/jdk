@@ -50,7 +50,7 @@ public class SumRedSqrt_Double {
                                                "-XX:LoopMaxUnroll=" + maxUnroll);
                 i++;
             }
-	}
+        }
         framework.addScenarios(scenarios);
         framework.start();
     }
