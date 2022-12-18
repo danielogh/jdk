@@ -101,9 +101,19 @@ public class IREncodingPrinter {
                                   "[IREncodingPrinter]", true);
     }
 
+    // 8297490 : place applyIfCPUFeature before applyIf, to prevent possible test failure on use of platform-specific flags
     private boolean shouldApplyIrRule(IR irAnno, String m) {
         checkIRAnnotations(irAnno);
         if (isIRNodeUnsupported(irAnno)) {
+            return false;
+        } else if (irAnno.applyIfCPUFeature().length != 0 && !hasAllRequiredCPUFeature(irAnno.applyIfCPUFeature())) {
+            printDisableReason(m, "Feature constraint not met");
+            return false;
+        } else if (irAnno.applyIfCPUFeatureAnd().length != 0 && !hasAllRequiredCPUFeature(irAnno.applyIfCPUFeatureAnd())) {
+            printDisableReason(m, "All feature constraints not met");
+            return false;
+        } else if (irAnno.applyIfCPUFeatureOr().length != 0 && !hasAnyRequiredCPUFeature(irAnno.applyIfCPUFeatureOr())) {
+            printDisableReason(m, "None of the feature constraints met");
             return false;
         } else if (irAnno.applyIf().length != 0 && !hasAllRequiredFlags(irAnno.applyIf(), "applyIf")) {
             printDisableReason(m, "Flag constraint not met");
@@ -116,15 +126,6 @@ public class IREncodingPrinter {
             return false;
         } else if (irAnno.applyIfOr().length != 0 && hasNoRequiredFlags(irAnno.applyIfOr(), "applyIfOr")) {
             printDisableReason(m, "None of the flag constraints met");
-            return false;
-        } else if (irAnno.applyIfCPUFeature().length != 0 && !hasAllRequiredCPUFeature(irAnno.applyIfCPUFeature())) {
-            printDisableReason(m, "Feature constraint not met");
-            return false;
-        } else if (irAnno.applyIfCPUFeatureAnd().length != 0 && !hasAllRequiredCPUFeature(irAnno.applyIfCPUFeatureAnd())) {
-            printDisableReason(m, "All feature constraints not met");
-            return false;
-        } else if (irAnno.applyIfCPUFeatureOr().length != 0 && !hasAnyRequiredCPUFeature(irAnno.applyIfCPUFeatureOr())) {
-            printDisableReason(m, "None of the feature constraints met");
             return false;
         } else {
             // All preconditions satisfied: apply rule.
