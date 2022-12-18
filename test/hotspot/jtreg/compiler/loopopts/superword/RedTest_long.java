@@ -41,8 +41,7 @@ public class RedTest_long {
         framework.addFlags("-XX:+IgnoreUnrecognizedVMOptions",
                            "-XX:LoopUnrollLimit=250",
                            "-XX:CompileThresholdScaling=0.1",
-                           "-XX:-TieredCompilation",
-                           "-XX:+RecomputeReductions");
+                           "-XX:-TieredCompilation");
         int i = 0;
         Scenario[] scenarios = new Scenario[8];
         for (String reductionSign : new String[] {"+", "-"}) {
@@ -222,7 +221,6 @@ public class RedTest_long {
     @IR(applyIfCPUFeature = {"avx512dq", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "UseAVX", ">= 3"},
         counts = {IRNode.MUL_REDUCTION_VL, ">= 1"})
-    // Not yet AArch64
     public static long mulReductionImplement(
             long[] a,
             long[] b,
