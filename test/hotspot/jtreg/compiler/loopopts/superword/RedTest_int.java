@@ -217,7 +217,7 @@ public class RedTest_int {
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
         failOn = {IRNode.MUL_REDUCTION_VI})
-    @IR(applyIfCPUFeature = {"sse4_1", "true"},
+    @IR(applyIfCPUFeature = {"sse4.1", "true"},
             applyIfAnd = {"SuperWordReductions", "true", "UseSSE", ">= 4", "LoopMaxUnroll", ">= 8"},
             counts = {IRNode.MUL_REDUCTION_VI, ">= 1"})
     public static int mulReductionImplement(
