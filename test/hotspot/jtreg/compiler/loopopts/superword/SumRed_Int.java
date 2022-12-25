@@ -94,7 +94,7 @@ public class SumRed_Int {
     @IR(applyIf = {"SuperWordReductions", "false"},
         failOn = {IRNode.ADD_REDUCTION_VI})
     @IR(applyIfCPUFeature = {"ssse3", "true"},
-        applyIfAnd = {"SuperWordReductions", "true", "UseSSE", ">= 3", "LoopMaxUnroll", ">= 8"},
+        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
         counts = {IRNode.ADD_REDUCTION_VI, ">= 1"})
     public static int sumReductionImplement(
             int[] a,

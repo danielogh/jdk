@@ -84,7 +84,7 @@ public class ProdRed_Int {
     @IR(applyIf = {"SuperWordReductions", "false"},
         failOn = {IRNode.MUL_REDUCTION_VI})
     @IR(applyIfCPUFeature = {"sse4.1", "true"},
-        applyIfAnd = {"SuperWordReductions", "true", "UseSSE", ">= 4", "LoopMaxUnroll", ">= 8"},
+        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
         counts = {IRNode.MUL_REDUCTION_VI, ">= 1"})
     public static int prodReductionImplement(int[] a, int[] b, int total) {
         for (int i = 0; i < a.length; i++) {
