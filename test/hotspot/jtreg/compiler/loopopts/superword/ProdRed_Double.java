@@ -81,9 +81,9 @@ public class ProdRed_Double {
         }
     }
 
-    // Reduction nodes not emitted for this test.
+    //No reduction nodes emitted.
     //@IR(applyIfCPUFeature = {"sse", "true"},
-    //    applyIfAnd = {"SuperWordReductions", "true", "UseSSE", ">= 1", "LoopMaxUnroll", ">= 8"},
+    //    applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
     //    counts = {IRNode.MUL_REDUCTION_VD, ">= 1"})
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
