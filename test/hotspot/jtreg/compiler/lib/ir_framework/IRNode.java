@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2023, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -1238,6 +1238,17 @@ public class IRNode {
     static {
         superWordNodes(XOR_REDUCTION_V, "XorReductionV");
     }
+
+    public static final String XOR3_NEON = PREFIX + "XOR3_NEON" + POSTFIX;
+    static {
+        machOnlyNameRegex(XOR3_NEON, "veor3_neon");
+    }
+
+    public static final String XOR3_SVE = PREFIX + "XOR3_SVE" + POSTFIX;
+    static {
+        machOnlyNameRegex(XOR3_SVE, "veor3_sve");
+    }
+
     /*
      * Utility methods to set up IR_NODE_MAPPINGS.
      */
