@@ -93,8 +93,8 @@ public class SumRedSqrt_Double {
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
         failOn = {IRNode.ADD_REDUCTION_VD})
-    @IR(applyIfCPUFeature = {"avx", "true"},
-        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
+    @IR(applyIfCPUFeature = {"sse", "true"},
+        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "MaxVectorSize", ">= 32"},
         counts = {IRNode.ADD_REDUCTION_VD, ">= 1"})
     public static double sumReductionImplement(
             double[] a,
