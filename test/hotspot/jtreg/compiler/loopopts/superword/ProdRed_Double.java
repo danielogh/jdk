@@ -82,7 +82,7 @@ public class ProdRed_Double {
     }
 
     //No reduction nodes emitted. Regression introduced in 8265783
-    //@IR(applyIfCPUFeature = {"sse", "true"},
+    //@IR(applyIfCPUFeature = {"sse2", "true"},
     //    applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
     //    counts = {IRNode.MUL_REDUCTION_VD, ">= 1"})
     @Test

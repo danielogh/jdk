@@ -84,7 +84,7 @@ public class ProdRed_Float {
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
         failOn = {IRNode.MUL_REDUCTION_VF})
-    @IR(applyIfCPUFeature = {"sse", "true"},
+    @IR(applyIfCPUFeature = {"sse2", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
         counts = {IRNode.MUL_REDUCTION_VF, ">= 1"})
     public static float prodReductionImplement(float[] a, float[] b, float total) {
