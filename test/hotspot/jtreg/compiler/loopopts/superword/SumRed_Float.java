@@ -92,7 +92,7 @@ public class SumRed_Float {
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
         failOn = {IRNode.ADD_REDUCTION_VF})
-    @IR(applyIfCPUFeature = {"sse", "true"},
+    @IR(applyIfCPUFeature = {"sse2", "true"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
         counts = {IRNode.ADD_REDUCTION_VF, ">= 1"})
     public static float sumReductionImplement(
