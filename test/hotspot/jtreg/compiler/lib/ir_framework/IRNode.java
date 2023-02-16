@@ -722,6 +722,7 @@ public class IRNode {
     public static final String MUL_REDUCTION_VF = PREFIX + "MUL_REDUCTION_VF" + POSTFIX;
     static {
         superWordNodes(MUL_REDUCTION_VF, "MulReductionVF");
+    }
 
     public static final String MUL_REDUCTION_VI = PREFIX + "MUL_REDUCTION_VI" + POSTFIX;
     static {
