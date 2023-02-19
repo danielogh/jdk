@@ -40,8 +40,7 @@ public class SumRed_Int {
         framework.addFlags("-XX:+IgnoreUnrecognizedVMOptions",
                            "-XX:LoopUnrollLimit=250",
                            "-XX:CompileThresholdScaling=0.1",
-                           "-XX:-TieredCompilation",
-                           "-XX:+RecomputeReductions");
+                           "-XX:-TieredCompilation");
         int i = 0;
         Scenario[] scenarios = new Scenario[8];
         for (String reductionSign : new String[] {"+", "-"}) {
@@ -93,8 +92,8 @@ public class SumRed_Int {
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
         failOn = {IRNode.ADD_REDUCTION_VI})
-    @IR(applyIfCPUFeature = {"ssse3", "true"},
-        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "MaxVectorSize", ">= 32"},
+    @IR(applyIfCPUFeature = {"sse4.1", "true"},
+        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
         counts = {IRNode.ADD_REDUCTION_VI, ">= 1"})
     public static int sumReductionImplement(
             int[] a,

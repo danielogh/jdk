@@ -141,8 +141,8 @@ public class RedTest_long {
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
         failOn = {IRNode.ADD_REDUCTION_VL})
-    @IR(applyIfCPUFeature = {"sse2", "true"},
-        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "MaxVectorSize", ">= 32"},
+    @IR(applyIfCPUFeature = {"avx2", "true"},
+        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
         counts = {IRNode.ADD_REDUCTION_VL, ">= 1"})
     public static long sumReductionImplement(
             long[] a,
@@ -160,8 +160,8 @@ public class RedTest_long {
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
         failOn = {IRNode.OR_REDUCTION_V})
-    @IR(applyIfCPUFeature = {"sse4.1", "true"},
-        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "MaxVectorSize", ">= 32"},
+    @IR(applyIfCPUFeature = {"avx2", "true"},
+        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
         counts = {IRNode.OR_REDUCTION_V, ">= 1"})
     public static long orReductionImplement(
             long[] a,
@@ -179,8 +179,8 @@ public class RedTest_long {
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
         failOn = {IRNode.AND_REDUCTION_V})
-    @IR(applyIfCPUFeature = {"sse4.1", "true"},
-        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "MaxVectorSize", ">= 32"},
+    @IR(applyIfCPUFeature = {"avx2", "true"},
+        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
         counts = {IRNode.AND_REDUCTION_V, ">= 1"})
     public static long andReductionImplement(
             long[] a,
@@ -198,8 +198,8 @@ public class RedTest_long {
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
         failOn = {IRNode.XOR_REDUCTION_V})
-    @IR(applyIfCPUFeature = {"sse4.1", "true"},
-        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8", "MaxVectorSize", ">= 32"},
+    @IR(applyIfCPUFeature = {"avx2", "true"},
+        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
         counts = {IRNode.XOR_REDUCTION_V, ">= 1"})
     public static long xorReductionImplement(
             long[] a,
