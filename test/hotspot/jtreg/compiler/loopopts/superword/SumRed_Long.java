@@ -25,7 +25,7 @@
  * @test
  * @bug 8076276
  * @summary Add C2 x86 Superword support for scalar sum reduction optimizations : long test
- * @requires os.arch=="x86" | os.arch=="i386" | os.arch=="amd64" | os.arch=="x86_64"
+ * @requires os.arch=="amd64" | os.arch=="x86_64"
  * @library /test/lib /
  * @run driver compiler.loopopts.superword.SumRed_Long
  */
