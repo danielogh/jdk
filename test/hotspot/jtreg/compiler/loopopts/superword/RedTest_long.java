@@ -25,7 +25,7 @@
  * @test
  * @bug 8240248
  * @summary Add C2 x86 Superword support for scalar logical reduction optimizations : long test
- * @requires os.arch=="amd64" | os.arch=="x86_64" | os.arch=="aarch64" | os.arch=="riscv64"
+ * @requires vm.bits == "64"
  * @library /test/lib /
  * @run driver compiler.loopopts.superword.RedTest_long
  */
