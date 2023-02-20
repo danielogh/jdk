@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2023, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -81,10 +81,7 @@ public class ProdRed_Double {
         }
     }
 
-    //8300865 : No reduction nodes emitted
-    /* @IR(applyIfCPUFeature = {"sse4.1", "true"},
-    //    applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", ">= 8"},
-    //    counts = {IRNode.MUL_REDUCTION_VD, ">= 1"}) */
+    //8300865 : No reduction nodes emitted (x86_64)
     @Test
     @IR(applyIf = {"SuperWordReductions", "false"},
         failOn = {IRNode.MUL_REDUCTION_VD})
