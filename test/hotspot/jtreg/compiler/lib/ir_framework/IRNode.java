@@ -171,6 +171,11 @@ public class IRNode {
         beforeMatchingNameRegex(ADD_VF, "AddVF");
     }
 
+    public static final String ADD_VL = PREFIX + "ADD_VL" + POSTFIX;
+    static {
+        beforeMatchingNameRegex(ADD_VL, "AddVL");
+    }
+
     public static final String ADD_REDUCTION_V = PREFIX + "ADD_REDUCTION_V" + POSTFIX;
     static {
         beforeMatchingNameRegex(ADD_REDUCTION_V, "AddReductionV(B|S|I|L|F|D)");
@@ -659,6 +664,11 @@ public class IRNode {
         beforeMatchingNameRegex(MAX_V, "MaxV");
     }
 
+    public static final String MAX_REDUCTION_V = PREFIX + "MAX_REDUCTION_V" + POSTFIX;
+    static {
+        beforeMatchingNameRegex(MAX_REDUCTION_V, "MaxReductionV");
+    }
+
     public static final String MEMBAR = PREFIX + "MEMBAR" + POSTFIX;
     static {
         beforeMatchingNameRegex(MEMBAR, "MemBar");
@@ -682,6 +692,11 @@ public class IRNode {
     public static final String MIN_V = PREFIX + "MIN_V" + POSTFIX;
     static {
         beforeMatchingNameRegex(MIN_V, "MinV");
+    }
+
+    public static final String MIN_REDUCTION_V = PREFIX + "MIN_REDUCTION_V" + POSTFIX;
+    static {
+        beforeMatchingNameRegex(MIN_REDUCTION_V, "MinReductionV");
     }
 
     public static final String MUL = PREFIX + "MUL" + POSTFIX;
@@ -712,6 +727,16 @@ public class IRNode {
     public static final String MUL_V = PREFIX + "MUL_V" + POSTFIX;
     static {
         beforeMatchingNameRegex(MUL_V, "MulV(B|S|I|L|F|D)");
+    }
+
+    public static final String MUL_VD = PREFIX + "MUL_VD" + POSTFIX;
+    static {
+        beforeMatchingNameRegex(MUL_VD, "MulVD");
+    }
+
+    public static final String MUL_VF = PREFIX + "MUL_VF" + POSTFIX;
+    static {
+        beforeMatchingNameRegex(MUL_VF, "MulVF");
     }
 
     public static final String MUL_VL = PREFIX + "MUL_VL" + POSTFIX;
@@ -987,6 +1012,11 @@ public class IRNode {
         beforeMatchingNameRegex(SQRT_V, "SqrtV(F|D)");
     }
 
+    public static final String SQRT_VD = PREFIX + "SQRT_VD" + POSTFIX;
+    static {
+        beforeMatchingNameRegex(SQRT_VD, "SqrtVD");
+    }
+
     public static final String STORE = PREFIX + "STORE" + POSTFIX;
     static {
         beforeMatchingNameRegex(STORE, "Store(B|C|S|I|L|F|D|P|N)");
@@ -1126,6 +1156,21 @@ public class IRNode {
     public static final String SUB_V = PREFIX + "SUB_V" + POSTFIX;
     static {
         beforeMatchingNameRegex(SUB_V, "SubV(B|S|I|L|F|D)");
+    }
+
+    public static final String SUB_VD = PREFIX + "SUB_VD" + POSTFIX;
+    static {
+        beforeMatchingNameRegex(SUB_VD, "SubVD");
+    }
+
+    public static final String SUB_VI = PREFIX + "SUB_VI" + POSTFIX;
+    static {
+        beforeMatchingNameRegex(SUB_VI, "SubVI");
+    }
+
+    public static final String SUB_VL = PREFIX + "SUB_VL" + POSTFIX;
+    static {
+        beforeMatchingNameRegex(SUB_VL, "SubVL");
     }
 
     public static final String TRAP = PREFIX + "TRAP" + POSTFIX;
