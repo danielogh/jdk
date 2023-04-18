@@ -29,7 +29,54 @@
  * @requires vm.compiler2.enabled
  * @library /test/lib /
  * @run driver compiler.loopopts.superword.TestReductionIR
- */
+   -XX:CompileCommand=compileonly,compiler.loopopts.superword.TestReductionIR::test*
+   -XX:CompileCommand=compileonly,compiler.loopopts.superword.TestReductionIR::verify*
+   -XX:CompileCommand=compileonly,compiler.loopopts.superword.TestReductionIR::fill*
+   -XX:LoopUnrollLimit=250
+   -XX:-TieredCompilation
+   -XX:-SuperWordReductions
+   -XX:LoopMaxUnroll=4
+ * @run driver compiler.loopopts.superword.TestReductionIR
+   -XX:CompileCommand=compileonly,compiler.loopopts.superword.TestReductionIR::test*
+   -XX:CompileCommand=compileonly,compiler.loopopts.superword.TestReductionIR::verify*
+   -XX:CompileCommand=compileonly,compiler.loopopts.superword.TestReductionIR::fill*
+   -XX:LoopUnrollLimit=250
+   -XX:-TieredCompilation
+   -XX:+SuperWordReductions
+   -XX:LoopMaxUnroll=4
+ * @run driver compiler.loopopts.superword.TestReductionIR
+   -XX:CompileCommand=compileonly,compiler.loopopts.superword.TestReductionIR::test*
+   -XX:CompileCommand=compileonly,compiler.loopopts.superword.TestReductionIR::verify*
+   -XX:CompileCommand=compileonly,compiler.loopopts.superword.TestReductionIR::fill*
+   -XX:LoopUnrollLimit=250
+   -XX:-TieredCompilation
+   -XX:-SuperWordReductions
+   -XX:LoopMaxUnroll=8
+ * @run driver compiler.loopopts.superword.TestReductionIR
+   -XX:CompileCommand=compileonly,compiler.loopopts.superword.TestReductionIR::test*
+   -XX:CompileCommand=compileonly,compiler.loopopts.superword.TestReductionIR::verify*
+   -XX:CompileCommand=compileonly,compiler.loopopts.superword.TestReductionIR::fill*
+   -XX:LoopUnrollLimit=250
+   -XX:-TieredCompilation
+   -XX:+SuperWordReductions
+   -XX:LoopMaxUnroll=8
+ * @run driver compiler.loopopts.superword.TestReductionIR
+   -XX:CompileCommand=compileonly,compiler.loopopts.superword.TestReductionIR::test*
+   -XX:CompileCommand=compileonly,compiler.loopopts.superword.TestReductionIR::verify*
+   -XX:CompileCommand=compileonly,compiler.loopopts.superword.TestReductionIR::fill*
+   -XX:LoopUnrollLimit=250
+   -XX:-TieredCompilation
+   -XX:-SuperWordReductions
+   -XX:LoopMaxUnroll=16
+ * @run driver compiler.loopopts.superword.TestReductionIR
+   -XX:CompileCommand=compileonly,compiler.loopopts.superword.TestReductionIR::test*
+   -XX:CompileCommand=compileonly,compiler.loopopts.superword.TestReductionIR::verify*
+   -XX:CompileCommand=compileonly,compiler.loopopts.superword.TestReductionIR::fill*
+   -XX:LoopUnrollLimit=250
+   -XX:-TieredCompilation
+   -XX:+SuperWordReductions
+   -XX:LoopMaxUnroll=16
+*/
 
 // TODO:
 // int / long: min, max - seems to be broken?
@@ -69,61 +116,8 @@ public class TestReductionIR {
     static final int RANGE = 512;
     static final int REPETITIONS = 100;
 
-    static int[] iArrA  = new int[RANGE];
-    static int[] iArrB  = new int[RANGE];
-    static int[] iArrC  = new int[RANGE];
-
-    static long[] lArrA  = new long[RANGE];
-    static long[] lArrB  = new long[RANGE];
-    static long[] lArrC  = new long[RANGE];
-
-    static float[] fArrA  = new float[RANGE];
-    static float[] fArrB  = new float[RANGE];
-    static float[] fArrC  = new float[RANGE];
-
-    static double[] dArrA  = new double[RANGE];
-    static double[] dArrB  = new double[RANGE];
-    static double[] dArrC  = new double[RANGE];
-    static double[] dArrR0 = new double[RANGE];
-    static double[] dArrR1 = new double[RANGE];
-
-    static byte[] bArrA = new byte[RANGE];
-    static byte[] bArrB = new byte[RANGE];
-    static byte[] bArrC = new byte[RANGE];
-
-    static char[] cArrA = new char[RANGE];
-    static char[] cArrB = new char[RANGE];
-    static char[] cArrC = new char[RANGE];
-
-    static short[] sArrA = new short[RANGE];
-    static short[] sArrB = new short[RANGE];
-    static short[] sArrC = new short[RANGE];
-
-
     public static void main(String args[]) {
         TestFramework framework = new TestFramework();
-        String compileonly0 = "-XX:CompileCommand=compileonly,compiler.loopopts.superword.TestReductionIR::test*";
-        String compileonly1 = "-XX:CompileCommand=compileonly,compiler.loopopts.superword.TestReductionIR::verify*";
-        String compileonly2 = "-XX:CompileCommand=compileonly,compiler.loopopts.superword.TestReductionIR::fill*";
-        String unrollLimit  = "-XX:LoopUnrollLimit=250";
-        String tieredcomp   = "-XX:-TieredCompilation";
-        Scenario s0 = new Scenario(0, "-XX:+SuperWordReductions", "-XX:LoopMaxUnroll=2",
-                                      compileonly0, compileonly1, compileonly2, unrollLimit, tieredcomp);
-        Scenario s1 = new Scenario(1, "-XX:-SuperWordReductions", "-XX:LoopMaxUnroll=2",
-                                      compileonly0, compileonly1, compileonly2, unrollLimit, tieredcomp);
-        Scenario s2 = new Scenario(2, "-XX:+SuperWordReductions", "-XX:LoopMaxUnroll=4",
-                                      compileonly0, compileonly1, compileonly2, unrollLimit, tieredcomp);
-        Scenario s3 = new Scenario(3, "-XX:-SuperWordReductions", "-XX:LoopMaxUnroll=4",
-                                      compileonly0, compileonly1, compileonly2, unrollLimit, tieredcomp);
-        Scenario s4 = new Scenario(4, "-XX:+SuperWordReductions", "-XX:LoopMaxUnroll=8",
-                                      compileonly0, compileonly1, compileonly2, unrollLimit, tieredcomp);
-        Scenario s5 = new Scenario(5, "-XX:-SuperWordReductions", "-XX:LoopMaxUnroll=8",
-                                      compileonly0, compileonly1, compileonly2, unrollLimit, tieredcomp);
-        Scenario s6 = new Scenario(6, "-XX:+SuperWordReductions", "-XX:LoopMaxUnroll=16",
-                                      compileonly0, compileonly1, compileonly2, unrollLimit, tieredcomp);
-        Scenario s7 = new Scenario(7, "-XX:-SuperWordReductions", "-XX:LoopMaxUnroll=16",
-                                      compileonly0, compileonly1, compileonly2, unrollLimit, tieredcomp);
-        framework.addScenarios(s0, s1, s2, s3, s4, s5, s6, s7);
         framework.start();
     }
 
@@ -155,6 +149,9 @@ public class TestReductionIR {
     @Run(test = "testReductionAddInt")
     @Warmup(0)
     public void runTestReductionAddInt() {
+        int[] iArrA = new int[RANGE];
+        int[] iArrB = new int[RANGE];
+        int[] iArrC = new int[RANGE];
         for (int j = 0; j < REPETITIONS; j++) {
             fillRandom(iArrA, iArrB, iArrC);
             int init = RunInfo.getRandom().nextInt();
@@ -190,6 +187,8 @@ public class TestReductionIR {
     @Run(test = "testReductionMulInt")
     @Warmup(0)
     public void runTestReductionMulInt() {
+        int[] iArrA = new int[RANGE];
+        int[] iArrB = new int[RANGE];
         for (int j = 0; j < REPETITIONS; j++) {
             fillSmallPrimeDiff(iArrA, iArrB);
             int init = fillSmallPrime();
@@ -228,8 +227,10 @@ public class TestReductionIR {
     @Run(test = "testReductionXorInt")
     @Warmup(0)
     public void runTestReductionXorInt() {
+        int[] iArrA = new int[RANGE];
+        int[] iArrB = new int[RANGE];
         for (int j = 0; j < REPETITIONS; j++) {
-            fillRandom(iArrA, iArrB, iArrC);
+            fillRandom(iArrA, iArrB);
             int init = RunInfo.getRandom().nextInt();
             int s0 = testReductionXorInt(iArrA, iArrB, init);
             int s1 = referenceReductionXorInt(iArrA, iArrB, init);
@@ -263,6 +264,8 @@ public class TestReductionIR {
     @Run(test = "testReductionAndInt")
     @Warmup(0)
     public void runTestReductionAndInt() {
+        int[] iArrA = new int[RANGE];
+        int[] iArrB = new int[RANGE];
         for (int j = 0; j < REPETITIONS; j++) {
             fillSpecialBytes(iArrA, iArrB, 0xFFFFFFFF);
             int init = 0xFFFFFFFF; // start with all bits
@@ -301,6 +304,8 @@ public class TestReductionIR {
     @Run(test = "testReductionOrInt")
     @Warmup(0)
     public void runTestReductionOrInt() {
+        int[] iArrA = new int[RANGE];
+        int[] iArrB = new int[RANGE];
         for (int j = 0; j < REPETITIONS; j++) {
             fillSpecialBytes(iArrA, iArrB, 0);
             int init = 0; // start with no bits
@@ -310,7 +315,7 @@ public class TestReductionIR {
             if (s0 == 0 || s0 == 0xFFFFFFFF) {
                 throw new RuntimeException("Test should not collapse. " + s0);
             }
-	}
+	    }
     }
 
 // TODO Add once it works
@@ -351,6 +356,44 @@ public class TestReductionIR {
 //         }
 //     }
 
+//     // ------------------------------------ ReductionMaxInt --------------------------------------------------
+//
+//     @Test
+//     @IR(counts = {IRNode.LOAD_VECTOR, "= 0", IRNode.MUL_VI, "= 0",
+//                   IRNode.MAX_REDUCTION_VI, "= 0"},
+//         applyIfOr = {"SuperWordReductions", "false", "LoopMaxUnroll", "<= 4"})
+//     @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.MUL_VI, "> 0",
+//                   IRNode.MAX_REDUCTION_VI, "> 0"},
+//         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 4"},
+//         applyIfCPUFeatureOr = {"sse4.1", "true", "sve", "true"})
+//     public int testReductionMaxInt(int[] a, int sum) {
+//         for (int i = 0; i < RANGE; i++) {
+//             sum = Math.max(sum, a[i] * 11);
+//         }
+//         return sum;
+//     }
+//
+//     // Not compiled.
+//     public int referenceReductionMaxInt(int[] a, int sum) {
+//         for (int i = 0; i < RANGE; i++) {
+//             sum = Math.max(sum, a[i] * 11);
+//         }
+//         return sum;
+//     }
+//
+//     @Run(test = "testReductionMaxInt")
+//     @Warmup(0)
+//     public void runTestReductionMaxInt() {
+//         for (int j = 0; j < REPETITIONS; j++) {
+//             fillRandom(iArrA);
+//             int init = RunInfo.getRandom().nextInt();
+//             int s0 = testReductionMaxInt(iArrA, init);
+//             int s1 = referenceReductionMaxInt(iArrA, init);
+//             verify("testReductionMaxInt sum", s0, s1);
+//         }
+//     }
+
+
     // ------------------------------------ ReductionAddLong --------------------------------------------------
 
     @Test
@@ -360,7 +403,8 @@ public class TestReductionIR {
     @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.ADD_VL, "> 0", IRNode.MUL_VL, "> 0",
                   IRNode.ADD_REDUCTION_VL, "> 0"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 4"},
-        applyIfCPUFeatureOr = {"avx2", "true", "sve", "true"})
+        applyIfCPUFeatureOr = {"avx2", "true", "sve", "true"},
+        applyIfPlatformFeature = {"32-bit", "false"})
     @IR(counts = {IRNode.LOAD_VECTOR, "= 0"},
         applyIfCPUFeatureAnd = {"sse4.1", "true", "avx2", "false"})
     public long testReductionAddLong(long[] a, long[] b, long[] c, long sum) {
@@ -382,6 +426,9 @@ public class TestReductionIR {
     @Run(test = "testReductionAddLong")
     @Warmup(0)
     public void runTestReductionAddLong() {
+        long[] lArrA = new long[RANGE];
+        long[] lArrB = new long[RANGE];
+        long[] lArrC = new long[RANGE];
         for (int j = 0; j < REPETITIONS; j++) {
             fillRandom(lArrA, lArrB, lArrC);
             long init = RunInfo.getRandom().nextLong();
@@ -400,7 +447,8 @@ public class TestReductionIR {
     @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.SUB_VL, "> 0",
                   IRNode.MUL_REDUCTION_VL, "> 0"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 4"},
-        applyIfCPUFeatureOr = {"avx512dq", "true", "sve", "true"})
+        applyIfCPUFeatureOr = {"avx512dq", "true", "sve", "true"},
+        applyIfPlatformFeature = {"32-bit", "false"})
     @IR(counts = {IRNode.LOAD_VECTOR, "= 0"},
         applyIfCPUFeatureAnd = {"sse4.1", "true", "avx2", "false"})
     public long testReductionMulLong(long[] a, long[] b, long[] c, long mul) {
@@ -422,6 +470,9 @@ public class TestReductionIR {
     @Run(test = "testReductionMulLong")
     @Warmup(0)
     public void runTestReductionMulLong() {
+        long[] lArrA = new long[RANGE];
+        long[] lArrB = new long[RANGE];
+        long[] lArrC = new long[RANGE];
         for (int j = 0; j < REPETITIONS; j++) {
             fillSmallPrimeDiff(lArrA, lArrB);
             long init = fillSmallPrime();
@@ -443,7 +494,8 @@ public class TestReductionIR {
     @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.ADD_VL, "> 0",
                   IRNode.XOR_REDUCTION_V, "> 0"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 4"},
-        applyIfCPUFeatureOr = {"avx2", "true", "sve", "true"})
+        applyIfCPUFeatureOr = {"avx2", "true", "sve", "true"},
+        applyIfPlatformFeature = {"32-bit", "false"})
     @IR(counts = {IRNode.LOAD_VECTOR, "= 0"},
         applyIfCPUFeatureAnd = {"sse4.1", "true", "avx2", "false"})
     public long testReductionXorLong(long[] a, long[] b, long sum) {
@@ -465,6 +517,9 @@ public class TestReductionIR {
     @Run(test = "testReductionXorLong")
     @Warmup(0)
     public void runTestReductionXorLong() {
+        long[] lArrA = new long[RANGE];
+        long[] lArrB = new long[RANGE];
+        long[] lArrC = new long[RANGE];
         for (int j = 0; j < REPETITIONS; j++) {
             fillRandom(lArrA, lArrB, lArrC);
             long init = RunInfo.getRandom().nextLong();
@@ -483,7 +538,8 @@ public class TestReductionIR {
     @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.SUB_VL, "> 0",
                   IRNode.AND_REDUCTION_V, "> 0"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 4"},
-        applyIfCPUFeatureOr = {"avx2", "true", "sve", "true"})
+        applyIfCPUFeatureOr = {"avx2", "true", "sve", "true"},
+        applyIfPlatformFeature = {"32-bit", "false"})
     @IR(counts = {IRNode.LOAD_VECTOR, "= 0"},
         applyIfCPUFeatureAnd = {"sse4.1", "true", "avx2", "false"})
     public long testReductionAndLong(long[] a, long[] b, long sum) {
@@ -505,6 +561,8 @@ public class TestReductionIR {
     @Run(test = "testReductionAndLong")
     @Warmup(0)
     public void runTestReductionAndLong() {
+        long[] lArrA = new long[RANGE];
+        long[] lArrB = new long[RANGE];
         for (int j = 0; j < REPETITIONS; j++) {
             fillSpecialBytes(lArrA, lArrB, 0xFFFFFFFFFFFFFFFFL);
             long init = 0xFFFFFFFFFFFFFFFFL; // start with all bits
@@ -526,7 +584,8 @@ public class TestReductionIR {
     @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.SUB_VL, "> 0",
                   IRNode.OR_REDUCTION_V, "> 0"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 4"},
-        applyIfCPUFeatureOr = {"avx2", "true", "sve", "true"})
+        applyIfCPUFeatureOr = {"avx2", "true", "sve", "true"},
+        applyIfPlatformFeature = {"32-bit", "false"})
     @IR(counts = {IRNode.LOAD_VECTOR, "= 0"},
         applyIfCPUFeatureAnd = {"sse4.1", "true", "avx2", "false"})
     public long testReductionOrLong(long[] a, long[] b, long sum) {
@@ -548,6 +607,8 @@ public class TestReductionIR {
     @Run(test = "testReductionOrLong")
     @Warmup(0)
     public void runTestReductionOrLong() {
+        long[] lArrA = new long[RANGE];
+        long[] lArrB = new long[RANGE];
         for (int j = 0; j < REPETITIONS; j++) {
             fillSpecialBytes(lArrA, lArrB, 0);
             long init = 0; // start with no bits
@@ -560,6 +621,90 @@ public class TestReductionIR {
         }
     }
 
+    // ------------------------------------ ReductionMinLong --------------------------------------------------
+
+    @Test
+    @IR(counts = {IRNode.LOAD_VECTOR, "= 0", IRNode.MUL_VL, "= 0",
+                  IRNode.MIN_REDUCTION_V, "= 0"},
+        applyIfOr = {"SuperWordReductions", "false", "LoopMaxUnroll", "<= 4"})
+    @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.MUL_VL, "> 0",
+                  IRNode.MIN_REDUCTION_V, "> 0"},
+        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 4"},
+        applyIfCPUFeatureAnd = {"avx512dq", "true", "avx512vl", "true", "avx512dq", "true"})
+    @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.MUL_VL, "> 0",
+                  IRNode.MIN_REDUCTION_V, "> 0"},
+        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 4"},
+        applyIfCPUFeature = {"sve", "true"})
+    public long testReductionMinLong(long[] a, long sum) {
+        for (int i = 0; i < RANGE; i++) {
+            sum = Math.min(sum, a[i] * 11);
+        }
+        return sum;
+    }
+
+    // Not compiled.
+    public long referenceReductionMinLong(long[] a, long sum) {
+        for (int i = 0; i < RANGE; i++) {
+            sum = Math.min(sum, a[i] * 11);
+        }
+        return sum;
+    }
+
+    @Run(test = "testReductionMinLong")
+    @Warmup(0)
+    public void runTestReductionMinLong() {
+        long[] lArrA = new long[RANGE];
+        for (int j = 0; j < REPETITIONS; j++) {
+            fillRandom(lArrA);
+            long init = RunInfo.getRandom().nextLong();
+            long s0 = testReductionMinLong(lArrA, init);
+            long s1 = referenceReductionMinLong(lArrA, init);
+            verify("testReductionMinLong sum", s0, s1);
+        }
+    }
+
+    // ------------------------------------ ReductionMaxLong --------------------------------------------------
+
+    @Test
+    @IR(counts = {IRNode.LOAD_VECTOR, "= 0", IRNode.MUL_VL, "= 0",
+                  IRNode.MAX_REDUCTION_V, "= 0"},
+        applyIfOr = {"SuperWordReductions", "false", "LoopMaxUnroll", "<= 4"})
+    @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.MUL_VL, "> 0",
+                  IRNode.MAX_REDUCTION_V, "> 0"},
+        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 4"},
+        applyIfCPUFeatureAnd = {"avx512dq", "true", "avx512vl", "true", "avx512dq", "true"})
+    @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.MUL_VL, "> 0",
+                  IRNode.MAX_REDUCTION_V, "> 0"},
+        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 4"},
+        applyIfCPUFeature = {"sve", "true"})
+    public long testReductionMaxLong(long[] a, long sum) {
+        for (int i = 0; i < RANGE; i++) {
+            sum = Math.max(sum, a[i] * 11);
+        }
+        return sum;
+    }
+
+    // Not compiled.
+    public long referenceReductionMaxLong(long[] a, long sum) {
+        for (int i = 0; i < RANGE; i++) {
+            sum = Math.max(sum, a[i] * 11);
+        }
+        return sum;
+    }
+
+    @Run(test = "testReductionMaxLong")
+    @Warmup(0)
+    public void runTestReductionMaxLong() {
+        long[] lArrA = new long[RANGE];
+        for (int j = 0; j < REPETITIONS; j++) {
+            fillRandom(lArrA);
+            long init = RunInfo.getRandom().nextLong();
+            long s0 = testReductionMaxLong(lArrA, init);
+            long s1 = referenceReductionMaxLong(lArrA, init);
+            verify("testReductionMaxLong sum", s0, s1);
+        }
+    }
+
     // ------------------------------------ ReductionAddFloat --------------------------------------------------
 
     @Test
@@ -569,7 +714,8 @@ public class TestReductionIR {
     @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.ADD_VF, "> 0", IRNode.MUL_VF, "> 0",
                   IRNode.ADD_REDUCTION_VF, "> 0"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 4"},
-        applyIfCPUFeatureOr = {"sse4.1", "true", "sve", "true"})
+        applyIfPlatformFeature = {"32-bit", "false"},
+        applyIfCPUFeatureOr = {"sse2", "true", "sve", "true"})
     public float testReductionAddFloat(float[] a, float[] b, float[] c, float sum) {
         for (int i = 0; i < RANGE; i++) {
             sum += (a[i] * b[i]) + (a[i] * c[i]) + (b[i] * c[i]);
@@ -588,6 +734,9 @@ public class TestReductionIR {
     @Run(test = "testReductionAddFloat")
     @Warmup(0)
     public void runTestReductionAddFloat() {
+        float[] fArrA = new float[RANGE];
+        float[] fArrB = new float[RANGE];
+        float[] fArrC = new float[RANGE];
         for (int j = 0; j < REPETITIONS; j++) {
             fillRandom(fArrA, fArrB, fArrC);
             float init = RunInfo.getRandom().nextFloat();
@@ -611,67 +760,15 @@ public class TestReductionIR {
         }
     }
 
-    // ------------------------------------ ReductionMulFloat --------------------------------------------------
-
-    @Test
-    @IR(counts = {IRNode.LOAD_VECTOR, "= 0", IRNode.ADD_VF, "= 0", IRNode.MUL_VF, "= 0",
-                  IRNode.MUL_REDUCTION_VF, "= 0"},
-        applyIfOr = {"SuperWordReductions", "false", "LoopMaxUnroll", "<= 4"})
-    @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.ADD_VF, "> 0", IRNode.MUL_VF, "> 0",
-                  IRNode.MUL_REDUCTION_VF, "> 0"},
-        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 4"},
-        applyIfCPUFeatureOr = {"sse4.1", "true", "sve", "true"})
-    public float testReductionMulFloat(float[] a, float[] b, float[] c, float mul) {
-        for (int i = 0; i < RANGE; i++) {
-            // Ensure to have enough ops to make mul-reduction profitable.
-            // Ensure that product does not collapse to zero or infinity.
-            mul *= a[i] * 0.05f + b[i] * 0.07f + c[i] * 0.08f + 0.9f; // [0.9..1.1]
-        }
-        return mul;
-    }
-
-    // Not compiled.
-    public float referenceReductionMulFloat(float[] a, float[] b, float[] c, float mul) {
-        for (int i = 0; i < RANGE; i++) {
-            mul *= a[i] * 0.05f + b[i] * 0.07f + c[i] * 0.08f + 0.9f; // [0.9..1.1]
-        }
-        return mul;
-    }
-
-    @Run(test = "testReductionMulFloat")
-    @Warmup(0)
-    public void runTestReductionMulFloat() {
-        for (int j = 0; j < REPETITIONS; j++) {
-            fillRandom(fArrA, fArrB, fArrC);
-            float init = RunInfo.getRandom().nextFloat() + 1.0f; // avoid zero
-            float s0 = testReductionMulFloat(fArrA, fArrB, fArrC, init);
-            // // Comment: reduction order for floats matters. Swapping order leads to wrong results.
-            // // To verify: uncomment code below.
-            // float tmpA = fArrA[50];
-            // float tmpB = fArrB[50];
-            // float tmpC = fArrC[50];
-            // fArrA[50] = fArrA[51];
-            // fArrB[50] = fArrB[51];
-            // fArrC[50] = fArrC[51];
-            // fArrA[51] = tmpA;
-            // fArrB[51] = tmpB;
-            // fArrC[51] = tmpC;
-            float s1 = referenceReductionMulFloat(fArrA, fArrB, fArrC, init);
-            verify("testReductionMulFloat sum", s0, s1);
-            if (s0 == 0.0f || Float.isNaN(s0) || Float.isInfinite(s0)) {
-                throw new RuntimeException("Test should not collapse. " + s0);
-            }
-        }
-    }
-
     // ------------------------------------ ReductionMinFloat --------------------------------------------------
 
     @Test
     @IR(counts = {IRNode.LOAD_VECTOR, "= 0", IRNode.MUL_VF, "= 0", IRNode.MIN_REDUCTION_V, "= 0"},
-        applyIfOr = {"SuperWordReductions", "false", "LoopMaxUnroll", "<= 4"})
+        applyIfOr = {"SuperWordReductions", "false", "LoopMinUnroll", "<= 4"})
     @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.MUL_VF, "> 0", IRNode.MIN_REDUCTION_V, "> 0"},
-        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 4"},
-        applyIfCPUFeatureOr = {"avx", "true", "sve", "true"})
+        applyIfAnd = {"SuperWordReductions", "true", "LoopMinUnroll", "> 4"},
+        applyIfCPUFeatureOr = {"avx", "true", "sve", "true"},
+        applyIfPlatformFeature = {"32-bit", "false"})
     public float testReductionMinFloat(float[] a, float sum) {
         for (int i = 0; i < RANGE; i++) {
             // Note: MinReductionV requires at least AVX for float.
@@ -691,6 +788,7 @@ public class TestReductionIR {
     @Run(test = "testReductionMinFloat")
     @Warmup(0)
     public void runTestReductionMinFloat() {
+        float[] fArrA = new float[RANGE];
         for (int j = 0; j < REPETITIONS; j++) {
             fillRandom(fArrA);
             float init = RunInfo.getRandom().nextFloat();
@@ -707,7 +805,8 @@ public class TestReductionIR {
         applyIfOr = {"SuperWordReductions", "false", "LoopMaxUnroll", "<= 4"})
     @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.MUL_VF, "> 0", IRNode.MAX_REDUCTION_V, "> 0"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 4"},
-        applyIfCPUFeatureOr = {"avx", "true", "sve", "true"})
+        applyIfCPUFeatureOr = {"avx", "true", "sve", "true"},
+        applyIfPlatformFeature = {"32-bit", "false"})
     public float testReductionMaxFloat(float[] a, float sum) {
         for (int i = 0; i < RANGE; i++) {
             // Note: MaxReductionV requires at least AVX for float.
@@ -727,6 +826,7 @@ public class TestReductionIR {
     @Run(test = "testReductionMaxFloat")
     @Warmup(0)
     public void runTestReductionMaxFloat() {
+        float[] fArrA = new float[RANGE];
         for (int j = 0; j < REPETITIONS; j++) {
             fillRandom(fArrA);
             float init = RunInfo.getRandom().nextFloat();
@@ -764,6 +864,9 @@ public class TestReductionIR {
     @Run(test = "testReductionAddAbsNegFloat")
     @Warmup(0)
     public void runTestReductionAddAbsNegFloat() {
+        float[] fArrA = new float[RANGE];
+        float[] fArrB = new float[RANGE];
+        float[] fArrC = new float[RANGE];
         for (int j = 0; j < REPETITIONS; j++) {
             fillRandom(fArrA, fArrB, fArrC);
             float init = RunInfo.getRandom().nextFloat();
@@ -782,7 +885,7 @@ public class TestReductionIR {
     @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.ADD_VD, "> 0", IRNode.MUL_VD, "> 0", IRNode.STORE_VECTOR, "> 0",
                   IRNode.ADD_REDUCTION_VD, "> 0"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 4"},
-        applyIfCPUFeatureOr = {"sse4.1", "true", "sve", "true"})
+        applyIfCPUFeatureOr = {"sse2", "true", "sve", "true"})
     public double testReductionAddDouble(double[] a, double[] b, double[] c, double[] r, double sum) {
         for (int i = 0; i < RANGE; i++) {
             r[i] = (a[i] * b[i]) + (a[i] * c[i]) + (b[i] * c[i]);
@@ -803,6 +906,11 @@ public class TestReductionIR {
     @Run(test = "testReductionAddDouble")
     @Warmup(0)
     public void runTestReductionAddDouble() {
+        double[] dArrA = new double[RANGE];
+        double[] dArrB = new double[RANGE];
+        double[] dArrC = new double[RANGE];
+        double[] dArrR0 = new double[RANGE];
+        double[] dArrR1 = new double[RANGE];
         for (int j = 0; j < REPETITIONS; j++) {
             fillRandom(dArrA, dArrB, dArrC);
             double init = RunInfo.getRandom().nextDouble();
@@ -857,6 +965,11 @@ public class TestReductionIR {
     @Run(test = "testReductionAddDoubleSqrt")
     @Warmup(0)
     public void runTestReductionAddDoubleSqrt() {
+        double[] dArrA = new double[RANGE];
+        double[] dArrB = new double[RANGE];
+        double[] dArrC = new double[RANGE];
+        double[] dArrR0 = new double[RANGE];
+        double[] dArrR1 = new double[RANGE];
         for (int j = 0; j < REPETITIONS; j++) {
             fillRandom(dArrA, dArrB, dArrC);
             double init = RunInfo.getRandom().nextDouble();
@@ -890,7 +1003,7 @@ public class TestReductionIR {
     @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.ADD_VD, "> 0", IRNode.MUL_VD, "> 0", IRNode.STORE_VECTOR, "> 0",
                   IRNode.MUL_REDUCTION_VD, "> 0"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 4"},
-        applyIfCPUFeatureOr = {"sse4.1", "true", "sve", "true"})
+        applyIfCPUFeatureOr = {"sse2", "true", "sve", "true"})
     public double testReductionMulDouble(double[] a, double[] b, double[] c, double[] r, double mul) {
         for (int i = 0; i < RANGE; i++) {
             r[i] = a[i] * 0.05 + b[i] * 0.07 + c[i] * 0.08 + 0.9; // [0.9..1.1]
@@ -911,6 +1024,11 @@ public class TestReductionIR {
     @Run(test = "testReductionMulDouble")
     @Warmup(0)
     public void runTestReductionMulDouble() {
+        double[] dArrA = new double[RANGE];
+        double[] dArrB = new double[RANGE];
+        double[] dArrC = new double[RANGE];
+        double[] dArrR0 = new double[RANGE];
+        double[] dArrR1 = new double[RANGE];
         for (int j = 0; j < REPETITIONS; j++) {
             fillRandom(dArrA, dArrB, dArrC);
             double init = RunInfo.getRandom().nextDouble() + 1.0; // avoid zero
@@ -944,7 +1062,8 @@ public class TestReductionIR {
     @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.ADD_VD, "> 0", IRNode.MUL_VD, "> 0", IRNode.STORE_VECTOR, "> 0",
                   IRNode.MIN_REDUCTION_V, "> 0"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 4"},
-        applyIfCPUFeatureOr = {"avx", "true", "sve", "true"})
+        applyIfCPUFeatureOr = {"avx", "true", "sve", "true"},
+        applyIfPlatformFeature = {"32-bit", "false"})
     public double testReductionMinDouble(double[] a, double[] b, double[] c, double[] r, double sum) {
         for (int i = 0; i < RANGE; i++) {
             // Note: AVX required for MinReductionV for double.
@@ -966,6 +1085,11 @@ public class TestReductionIR {
     @Run(test = "testReductionMinDouble")
     @Warmup(0)
     public void runTestReductionMinDouble() {
+        double[] dArrA = new double[RANGE];
+        double[] dArrB = new double[RANGE];
+        double[] dArrC = new double[RANGE];
+        double[] dArrR0 = new double[RANGE];
+        double[] dArrR1 = new double[RANGE];
         for (int j = 0; j < REPETITIONS; j++) {
             fillRandom(dArrA, dArrB, dArrC);
             double init = RunInfo.getRandom().nextDouble();
@@ -1007,6 +1131,11 @@ public class TestReductionIR {
     @Run(test = "testReductionMaxDouble")
     @Warmup(0)
     public void runTestReductionMaxDouble() {
+        double[] dArrA = new double[RANGE];
+        double[] dArrB = new double[RANGE];
+        double[] dArrC = new double[RANGE];
+        double[] dArrR0 = new double[RANGE];
+        double[] dArrR1 = new double[RANGE];
         for (int j = 0; j < REPETITIONS; j++) {
             fillRandom(dArrA, dArrB, dArrC);
             double init = RunInfo.getRandom().nextDouble();
@@ -1014,7 +1143,7 @@ public class TestReductionIR {
             double s1 = referenceReductionMaxDouble(dArrA, dArrB, dArrC, dArrR1, init);
             verify("testReductionMaxDouble sum", s0, s1);
             verify("testReductionMaxDouble r", dArrR0, dArrR1);
-	}
+	    }
     }
 
 // TODO fix it
@@ -1059,235 +1188,41 @@ public class TestReductionIR {
 //    }
 
 
-    @Test
-    @IR(counts = {IRNode.LOAD_VECTOR, "= 0", IRNode.ADD_V, "= 0", IRNode.MUL_V, "= 0",
-                  IRNode.ADD_REDUCTION_V, "= 0"},
-        applyIfOr = {"SuperWordReductions", "false", "LoopMaxUnroll", "<= 4"})
-    @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.ADD_V, "> 0", IRNode.MUL_V, "> 0",
-                  IRNode.ADD_REDUCTION_V, "> 0"},
-        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 4"},
-        applyIfCPUFeatureOr = {"avx512bw", "true", "sve", "true"})
-    public byte testReductionAddByte(byte[] a, byte[] b, byte[] c, byte sum) {
-        for (int i = 0; i < RANGE; i++) {
-            sum += (a[i] * b[i]) + (a[i] * c[i]) + (b[i] * c[i]);
-        }
-        return sum;
-    }
-
-    // Not compiled.
-    public byte referenceReductionAddByte(byte[] a, byte[] b, byte[] c, byte sum) {
-        for (int i = 0; i < RANGE; i++) {
-            sum += (a[i] * b[i]) + (a[i] * c[i]) + (b[i] * c[i]);
-        }
-        return sum;
-    }
-
-    @Run(test = "testReductionAddByte")
-    @Warmup(0)
-    public void runTestReductionAddByte() {
-        for (int j = 0; j < REPETITIONS; j++) {
-            fillRandom(bArrA, bArrB, bArrC);
-            byte init = (byte) (RunInfo.getRandom().nextInt() % (1 << 15));
-            byte s0 = testReductionAddByte(bArrA, bArrB, bArrC, init);
-            byte s1 = referenceReductionAddByte(bArrA, bArrB, bArrC, init);
-            verify("testReductionAddByte sum", s0, s1);
-        }
-    }
-
-    // ------------------------------------ ReductionMulByte --------------------------------------------------
+    // ------------------------------------ ReductionAddMulShort2Int --------------------------------------------------
 
     @Test
-    @IR(counts = {IRNode.LOAD_VECTOR, "= 0", IRNode.SUB_VI, "= 0", IRNode.MUL_REDUCTION_V, "= 0"},
-        applyIfOr = {"SuperWordReductions", "false", "LoopMaxUnroll", "<= 4"})
-    @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.SUB_VI, "> 0", IRNode.MUL_REDUCTION_V, "> 0"},
+    @IR(counts = {IRNode.MUL_ADDS2I, "= 0"},
+        applyIfOr = {"SuperWordReductions", "false", "LoopMaxUnroll <= 4"})
+    @IR(counts = {IRNode.MUL_ADDS2I, "> 0"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 4"},
-        applyIfCPUFeatureOr = {"avx512bw", "true", "sve", "true"})
-    public byte testReductionMulByte(byte[] a, byte[] b, byte mul) {
-        for (int i = 0; i < RANGE; i++) {
-            mul *= a[i] - b[i];
+        applyIfCPUFeatureOr = {"sse2", "true", "sve", "true"})
+    public int testReductionAddMulShort2Int(short[] a, short[] b, int sum) {
+        for (int i = 0; i < RANGE / 2; i++) {
+            sum += ((a[2*i] * b[2*i]) + (a[2*i+1] * b[2*i+1]));
         }
-        return mul;
+        return sum;
     }
 
-    // Not compiled.
-    public byte referenceReductionMulByte(byte[] a, byte[] b, byte mul) {
-        for (int i = 0; i < RANGE; i++) {
-            mul *= a[i] - b[i];
+    public int referenceReductionAddMulShort2Int(short[] a, short[] b, int sum) {
+        for (int i = 0; i < RANGE / 2; i++) {
+            sum += ((a[2*i] * b[2*i]) + (a[2*i+1] * b[2*i+1]));
         }
-        return mul;
+        return sum;
     }
 
-    @Run(test = "testReductionMulByte")
+    @Run(test = "testReductionAddMulShort2Int")
     @Warmup(0)
-    public void runTestReductionMulByte() {
+    public void runTestReductionAddMulShort2Int() {
+        short[] sArrA = new short[RANGE];
+        short[] sArrB = new short[RANGE];
         for (int j = 0; j < REPETITIONS; j++) {
-            fillSmallPrimeDiff(bArrA, bArrB);
-            byte init = fillSmallPrimeByte();
-            byte s0 = testReductionMulByte(bArrA, bArrB, init);
-            byte s1 = referenceReductionMulByte(bArrA, bArrB, init);
-            verify("testReductionMulByte sum", s0, s1);
-            if (s0 == 0) {
-                throw new RuntimeException("Primes should not multiply to zero in int-ring.");
-            }
+            fillRandom(sArrA, sArrB);
+            int init = RunInfo.getRandom().nextInt();
+            int s0 = testReductionAddMulShort2Int(sArrA, sArrB, init);
+            int s1 = referenceReductionAddMulShort2Int(sArrA, sArrB, init);
+            verify("runTestReductionAddMulShort2Int sum", s0, s1);
         }
     }
-
-    // ------------------------------------ ReductionXorByte --------------------------------------------------
-
-    @Test
-    @IR(counts = {IRNode.LOAD_VECTOR, "= 0", IRNode.ADD_V, "= 0", IRNode.XOR_REDUCTION_V, "= 0"},
-        applyIfOr = {"SuperWordReductions", "false", "LoopMaxUnroll", "<= 4"})
-    @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.ADD_V, "> 0", IRNode.XOR_REDUCTION_V, "> 0"},
-        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 4"},
-        applyIfCPUFeatureOr = {"avx512bw", "true", "sve", "true"})
-    public byte testReductionXorByte(byte[] a, byte[] b, byte sum) {
-        for (int i = 0; i < RANGE; i++) {
-            sum ^= a[i] + b[i];
-        }
-        return sum;
-    }
-
-    // Not compiled.
-    public byte referenceReductionXorByte(byte[] a, byte[] b, byte sum) {
-        for (int i = 0; i < RANGE; i++) {
-            sum ^= a[i] + b[i];
-        }
-        return sum;
-    }
-
-    @Run(test = "testReductionXorByte")
-    @Warmup(0)
-    public void runTestReductionXorByte() {
-        for (int j = 0; j < REPETITIONS; j++) {
-            fillRandom(bArrA, bArrB, bArrC);
-            byte init = (byte) (RunInfo.getRandom().nextInt() % (1 << 15));
-            byte s0 = testReductionXorByte(bArrA, bArrB, init);
-            byte s1 = referenceReductionXorByte(bArrA, bArrB, init);
-            verify("testReductionXorByte sum", s0, s1);
-        }
-    }
-
-    // ------------------------------------ ReductionAndByte --------------------------------------------------
-
-    @Test
-    @IR(counts = {IRNode.LOAD_VECTOR, "= 0", IRNode.SUB_VI, "= 0", IRNode.AND_REDUCTION_V, "= 0"},
-        applyIfOr = {"SuperWordReductions", "false", "LoopMaxUnroll", "<= 4"})
-    @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.SUB_VI, "> 0", IRNode.AND_REDUCTION_V, "> 0"},
-        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 4"},
-        applyIfCPUFeatureOr = {"avx512bw", "true", "sve", "true"})
-    public byte testReductionAndByte(byte[] a, byte[] b, byte sum) {
-        for (int i = 0; i < RANGE; i++) {
-            sum &= a[i] - b[i];
-        }
-        return sum;
-    }
-
-    // Not compiled.
-    public byte referenceReductionAndByte(byte[] a, byte[] b, byte sum) {
-        for (int i = 0; i < RANGE; i++) {
-            sum &= a[i] - b[i];
-        }
-        return sum;
-    }
-
-    @Run(test = "testReductionAndByte")
-    @Warmup(0)
-    public void runTestReductionAndByte() {
-        for (int j = 0; j < REPETITIONS; j++) {
-            fillSpecialBytes(bArrA, bArrB, (byte) 0xFFFFFFFF);
-            byte init = (byte) 0xFFFFFFFF; // start with all bits
-            byte s0 = testReductionAndByte(bArrA, bArrB, init);
-            byte s1 = referenceReductionAndByte(bArrA, bArrB, init);
-            verify("testReductionAndByte sum", s0, s1);
-            if (s0 == 0 || s0 == (byte) 0xFFFFFFFF) {
-                throw new RuntimeException("Test should not collapse. " + s0);
-            }
-	}
-
-    }
-
-    // ------------------------------------ ReductionOrByte --------------------------------------------------
-
-    @Test
-    @IR(counts = {IRNode.LOAD_VECTOR, "= 0", IRNode.SUB_VI, "= 0", IRNode.OR_REDUCTION_V, "= 0"},
-        applyIfOr = {"SuperWordReductions", "false", "LoopMaxUnroll", "<= 4"})
-    @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.SUB_VI, "> 0", IRNode.OR_REDUCTION_V, "> 0"},
-        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 4"},
-        applyIfCPUFeatureOr = {"avx512bw", "true", "sve", "true"})
-    public byte testReductionOrByte(byte[] a, byte[] b, byte sum) {
-        for (int i = 0; i < RANGE; i++) {
-            sum |= a[i] - b[i];
-        }
-        return sum;
-    }
-
-    // Not compiled.
-    public byte referenceReductionOrByte(byte[] a, byte[] b, byte sum) {
-        for (int i = 0; i < RANGE; i++) {
-            sum |= a[i] - b[i];
-        }
-        return sum;
-    }
-
-    @Run(test = "testReductionOrByte")
-    @Warmup(0)
-    public void runTestReductionOrByte() {
-        for (int j = 0; j < REPETITIONS; j++) {
-            fillSpecialBytes(bArrA, bArrB, (byte) 0);
-            byte init = 0; // start with no bits
-            byte s0 = testReductionOrByte(bArrA, bArrB, init);
-            byte s1 = referenceReductionOrByte(bArrA, bArrB, init);
-            verify("testReductionOrByte sum", s0, s1);
-            if (s0 == 0 || s0 == 0xFFFFFFFF) {
-                throw new RuntimeException("Test should not collapse. " + s0);
-            }
-	}
-
-    }
-
-// TODO Add once it works
-//     // ------------------------------------ ReductionMinByte --------------------------------------------------
-// 
-
-//     @Test
-//     @IR(counts = {IRNode.LOAD_VECTOR, "= 0", IRNode.MUL_V, "= 0",
-//                   IRNode.MIN_REDUCTION_V, "= 0"},
-//         applyIfOr = {"SuperWordReductions", "false", "LoopMaxUnroll", "<= 4"})
-//     @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.MUL_V, "> 0",
-//                   IRNode.MIN_REDUCTION_V, "> 0"},
-//         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 4"},
-//         applyIfCPUFeatureOr = {"avx512bw", "true", "sve", "true"})
-//     public int testReductionMinByte(byte[] a, byte sum) {
-//         for (int i = 0; i < RANGE; i++) {
-//             sum = Math.min(sum, a[i] * 11);
-//         }
-//         return sum;
-//     }
-// 
-
-//     // Not compiled.
-//     public int referenceReductionMinByte(byte[] a, byte sum) {
-//         for (int i = 0; i < RANGE; i++) {
-//             sum = Math.min(sum, a[i] * 11);
-//         }
-//         return sum;
-//     }
-// 
-
-
-
-//     @Run(test = "testReductionMinByte")
-//     @Warmup(0)
-//     public void runTestReductionMinByte() {
-//         for (int j = 0; j < REPETITIONS; j++) {
-//             fillRandom(bArrA);
-//             int init = RunInfo.getRandom().nextByte();
-//             int s0 = testReductionMinByte(bArrA, init);
-//             int s1 = referenceReductionMinByte(bArrA, init);
-//             verify("testReductionMinByte sum", s0, s1);
-//         }
-//     }
-
 
     // ------------------------------------ VERIFICATION --------------------------------------------------
 
@@ -1347,20 +1282,6 @@ public class TestReductionIR {
         }
     }
 
-    static void verify(String name, byte v0, byte v1) {
-        if (v0 != v1) {
-            throw new RuntimeException(" Invalid " + name + " result: " + v0 + " != " + v1);
-        }
-    }
-
-    static void verify(String name, byte[] a0, byte[] a1) {
-        for (int i = 0; i < RANGE; i++) {
-            if (a0[i] != a1[i]) {
-                throw new RuntimeException(" Invalid " + name + " result: array[" + i + "]: " + a0[i] + " != " + a1[i]);
-            }
-        }
-    }
-
     static void verify(String name, short v0, short v1) {
         if (v0 != v1) {
             throw new RuntimeException(" Invalid " + name + " result: " + v0 + " != " + v1);
@@ -1375,32 +1296,14 @@ public class TestReductionIR {
         }
     }
 
-    static void verify(String name, char v0, char v1) {
-        if (v0 != v1) {
-            throw new RuntimeException(" Invalid " + name + " result: " + v0 + " != " + v1);
-        }
-    }
-
-    static void verify(String name, char[] a0, char[] a1) {
-        for (int i = 0; i < RANGE; i++) {
-            if (a0[i] != a1[i]) {
-                throw new RuntimeException(" Invalid " + name + " result: array[" + i + "]: " + a0[i] + " != " + a1[i]);
-            }
-        }
-    }
-
 
     // ------------------------------------ INITIALIZATION --------------------------------------------------
 
-    static void fillRandom(int[] a, int[] b, int[] c) {
-        fillRandom(a);
-        fillRandom(b);
-        fillRandom(c);
-    }
-
-    static void fillRandom(int[] arr) {
-        for (int i = 0; i < RANGE; i++) {
-            arr[i] = RunInfo.getRandom().nextInt();
+    static void fillRandom(int[]... arrs) {
+        for (int[] a : arrs) {
+            for (int i = 0; i < RANGE; i++) {
+                a[i] = RunInfo.getRandom().nextInt();
+            }
         }
     }
 
@@ -1442,15 +1345,11 @@ public class TestReductionIR {
         }
     }
 
-    static void fillRandom(long[] a, long[] b, long[] c) {
-        fillRandom(a);
-        fillRandom(b);
-        fillRandom(c);
-    }
-
-    static void fillRandom(long[] arr) {
-        for (int i = 0; i < RANGE; i++) {
-            arr[i] = RunInfo.getRandom().nextLong();
+    static void fillRandom(long[]... arrs) {
+        for (long[] a : arrs) {
+            for (int i = 0; i < RANGE; i++) {
+                a[i] = RunInfo.getRandom().nextLong();
+            }
         }
     }
 
@@ -1481,90 +1380,27 @@ public class TestReductionIR {
         }
     }
 
-    static void fillRandom(float[] a, float[] b, float[] c) {
-        fillRandom(a);
-        fillRandom(b);
-        fillRandom(c);
-    }
+    static void fillRandom(float[]... arrs) {
+        for (float[] a : arrs) {
+            for (int i = 0; i < RANGE; i++) {
+                a[i] = RunInfo.getRandom().nextFloat();
+            }
+        }
+    } 
 
-    static void fillRandom(float[] arr) {
-        for (int i = 0; i < RANGE; i++) {
-            arr[i] = RunInfo.getRandom().nextFloat();
+    static void fillRandom(double[]... arrs) {
+        for (double[] a : arrs) {
+            for (int i = 0; i < RANGE; i++) {
+                a[i] = RunInfo.getRandom().nextDouble();
+            }
         }
     }
 
-    static void fillRandom(double[] a, double[] b, double[] c) {
-        fillRandom(a);
-        fillRandom(b);
-        fillRandom(c);
-    }
-
-    static void fillRandom(double[] arr) {
-        for (int i = 0; i < RANGE; i++) {
-            arr[i] = RunInfo.getRandom().nextDouble();
-        }
-    }
-
-    static void fillRandom(byte[] a, byte[] b, byte[] c) {
-        fillRandom(a);
-        fillRandom(b);
-        fillRandom(c);
-    }
-
-    static void fillRandom(byte[] arr) {
-        for (int i = 0; i < RANGE; i++) {
-            arr[i] = (byte) (RunInfo.getRandom().nextInt() % (1 << 15));
-        }
-    }
-
-    static void fillSmallPrimeDiff(byte[] a, byte[] b) {
-        for (int i = 0; i < RANGE; i++) {
-            byte r = (byte) (RunInfo.getRandom().nextInt() % (1 << 15));
-            a[i] = r;
-            b[i] = (byte) (r + fillSmallPrimeByte());
-        }
-    }
-
-    // Fill such that subtraction reveals base, except for a few bits flipped
-    static void fillSpecialBytes(byte[] a, byte[] b, byte base) {
-        for (int i = 0; i < RANGE; i++) {
-            a[i] = base;
-        }
-        // set at least 1 bit, but at most 31
-        for (int i = 0; i < 31; i++) {
-            int pos = RunInfo.getRandom().nextInt(32);
-            int bit = 1 << pos;
-            int j = RunInfo.getRandom().nextInt(RANGE);
-            a[j] ^= (byte) bit; // set (xor / flip) the bit
-    }
-        for (int i = 0; i < RANGE; i++) {
-            byte r = (byte) (RunInfo.getRandom().nextInt() % (1 << 15));
-            a[i] += r;
-            b[i] = r;
-        }
-    }
-
-    static void fillRandom(short[] a, short[] b,short[] c) {
-        fillRandom(a);
-        fillRandom(b);
-        fillRandom(c);
-    }
-
-    static void fillRandom(short[] arr) {
-        for (int i = 0; i < RANGE; i++) {
-            arr[i] = (short) (RunInfo.getRandom().nextInt() % (1 << 16));
-        }
-    }
-
-    static void fillRandom(char[] a, char[] b, double[] c) {
-        fillRandom(a);
-        fillRandom(b);
-        fillRandom(c);
-    }
-
-    static void fillRandom(char[] arr) {
-        for (int i = 0; i < RANGE; i++) {
-            arr[i] = (char) ((RunInfo.getRandom().nextInt() % 65535) & ~-2);
+    static void fillRandom(short[]... arrs) {
+        for (short[] a : arrs) {
+            for (int i = 0; i < RANGE; i++) {
+                a[i] = (short) RunInfo.getRandom().nextInt(-32768, 32767 + 1);
+            }
         }
     }
 
