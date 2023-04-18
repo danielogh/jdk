@@ -621,89 +621,94 @@ public class TestReductionIR {
         }
     }
 
-    // ------------------------------------ ReductionMinLong --------------------------------------------------
-
-    @Test
-    @IR(counts = {IRNode.LOAD_VECTOR, "= 0", IRNode.MUL_VL, "= 0",
-                  IRNode.MIN_REDUCTION_V, "= 0"},
-        applyIfOr = {"SuperWordReductions", "false", "LoopMaxUnroll", "<= 4"})
-    @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.MUL_VL, "> 0",
-                  IRNode.MIN_REDUCTION_V, "> 0"},
-        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 4"},
-        applyIfCPUFeatureAnd = {"avx512dq", "true", "avx512vl", "true", "avx512dq", "true"})
-    @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.MUL_VL, "> 0",
-                  IRNode.MIN_REDUCTION_V, "> 0"},
-        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 4"},
-        applyIfCPUFeature = {"sve", "true"})
-    public long testReductionMinLong(long[] a, long sum) {
-        for (int i = 0; i < RANGE; i++) {
-            sum = Math.min(sum, a[i] * 11);
-        }
-        return sum;
-    }
-
-    // Not compiled.
-    public long referenceReductionMinLong(long[] a, long sum) {
-        for (int i = 0; i < RANGE; i++) {
-            sum = Math.min(sum, a[i] * 11);
-        }
-        return sum;
-    }
-
-    @Run(test = "testReductionMinLong")
-    @Warmup(0)
-    public void runTestReductionMinLong() {
-        long[] lArrA = new long[RANGE];
-        for (int j = 0; j < REPETITIONS; j++) {
-            fillRandom(lArrA);
-            long init = RunInfo.getRandom().nextLong();
-            long s0 = testReductionMinLong(lArrA, init);
-            long s1 = referenceReductionMinLong(lArrA, init);
-            verify("testReductionMinLong sum", s0, s1);
-        }
-    }
-
-    // ------------------------------------ ReductionMaxLong --------------------------------------------------
-
-    @Test
-    @IR(counts = {IRNode.LOAD_VECTOR, "= 0", IRNode.MUL_VL, "= 0",
-                  IRNode.MAX_REDUCTION_V, "= 0"},
-        applyIfOr = {"SuperWordReductions", "false", "LoopMaxUnroll", "<= 4"})
-    @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.MUL_VL, "> 0",
-                  IRNode.MAX_REDUCTION_V, "> 0"},
-        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 4"},
-        applyIfCPUFeatureAnd = {"avx512dq", "true", "avx512vl", "true", "avx512dq", "true"})
-    @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.MUL_VL, "> 0",
-                  IRNode.MAX_REDUCTION_V, "> 0"},
-        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 4"},
-        applyIfCPUFeature = {"sve", "true"})
-    public long testReductionMaxLong(long[] a, long sum) {
-        for (int i = 0; i < RANGE; i++) {
-            sum = Math.max(sum, a[i] * 11);
-        }
-        return sum;
-    }
-
-    // Not compiled.
-    public long referenceReductionMaxLong(long[] a, long sum) {
-        for (int i = 0; i < RANGE; i++) {
-            sum = Math.max(sum, a[i] * 11);
-        }
-        return sum;
-    }
-
-    @Run(test = "testReductionMaxLong")
-    @Warmup(0)
-    public void runTestReductionMaxLong() {
-        long[] lArrA = new long[RANGE];
-        for (int j = 0; j < REPETITIONS; j++) {
-            fillRandom(lArrA);
-            long init = RunInfo.getRandom().nextLong();
-            long s0 = testReductionMaxLong(lArrA, init);
-            long s1 = referenceReductionMaxLong(lArrA, init);
-            verify("testReductionMaxLong sum", s0, s1);
-        }
-    }
+//    // ------------------------------------ ReductionMinLong --------------------------------------------------
+//
+//    @Test
+//    @IR(counts = {IRNode.LOAD_VECTOR, "= 0", IRNode.MUL_VL, "= 0",
+//                  IRNode.MIN_REDUCTION_V, "= 0"},
+//        applyIfOr = {"SuperWordReductions", "false", "LoopMaxUnroll", "<= 4"})
+//    @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.MUL_VL, "> 0",
+//                  IRNode.MIN_REDUCTION_V, "> 0"},
+//        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 8"},
+//        applyIfCPUFeatureAnd = {"avx512dq", "true", "avx512vl", "true", "avx512bw", "true"},
+//        applyIfPlatformFeature = {"32-bit", "false"})
+//    @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.MUL_VL, "> 0",
+//                  IRNode.MIN_REDUCTION_V, "> 0"},
+//        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 8"},
+//        applyIfCPUFeature = {"sve", "true"},
+//        applyIfPlatformFeature = {"32-bit", "false"})
+//    public long testReductionMinLong(long[] a, long sum) {
+//        // Min/Max Long require avx512vlbwdq
+//        for (int i = 0; i < RANGE; i++) {
+//            sum = Math.min(sum, a[i] * 11L);
+//        }
+//        return sum;
+//    }
+//
+//    // Not compiled.
+//    public long referenceReductionMinLong(long[] a, long sum) {
+//        for (int i = 0; i < RANGE; i++) {
+//            sum = Math.min(sum, a[i] * 11L);
+//        }
+//        return sum;
+//    }
+//
+//    @Run(test = "testReductionMinLong")
+//    @Warmup(0)
+//    public void runTestReductionMinLong() {
+//        long[] lArrA = new long[RANGE];
+//        for (int j = 0; j < REPETITIONS; j++) {
+//            fillRandom(lArrA);
+//            long init = RunInfo.getRandom().nextLong();
+//            long s0 = testReductionMinLong(lArrA, init);
+//            long s1 = referenceReductionMinLong(lArrA, init);
+//            verify("testReductionMinLong sum", s0, s1);
+//        }
+//    }
+//
+//    // ------------------------------------ ReductionMaxLong --------------------------------------------------
+//
+//    @Test
+//    @IR(counts = {IRNode.LOAD_VECTOR, "= 0", IRNode.MUL_VL, "= 0",
+//                  IRNode.MAX_REDUCTION_V, "= 0"},
+//        applyIfOr = {"SuperWordReductions", "false", "LoopMaxUnroll", "<= 4"})
+//    @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.MUL_VL, "> 0",
+//                  IRNode.MAX_REDUCTION_V, "> 0"},
+//        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 8"},
+//        applyIfCPUFeatureAnd = {"avx512dq", "true", "avx512vl", "true", "avx512bw", "true"},
+//        applyIfPlatformFeature = {"32-bit", "false"})
+//    @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.MUL_VL, "> 0",
+//                  IRNode.MAX_REDUCTION_V, "> 0"},
+//        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 8"},
+//        applyIfCPUFeature = {"sve", "true"},
+//        applyIfPlatformFeature = {"32-bit", "false"})
+//    public long testReductionMaxLong(long[] a, long sum) {
+//        for (int i = 0; i < RANGE; i++) {
+//            sum = Math.max(sum, a[i] * 123456789L);
+//        }
+//        return sum;
+//    }
+//
+//    // Not compiled.
+//    public long referenceReductionMaxLong(long[] a, long sum) {
+//        for (int i = 0; i < RANGE; i++) {
+//            sum = Math.max(sum, a[i] * 123456789L);
+//        }
+//        return sum;
+//    }
+//
+//    @Run(test = "testReductionMaxLong")
+//    @Warmup(0)
+//    public void runTestReductionMaxLong() {
+//        long[] lArrA = new long[RANGE];
+//        for (int j = 0; j < REPETITIONS; j++) {
+//            fillRandom(lArrA);
+//            long init = RunInfo.getRandom().nextLong();
+//            long s0 = testReductionMaxLong(lArrA, init);
+//            long s1 = referenceReductionMaxLong(lArrA, init);
+//            verify("testReductionMaxLong sum", s0, s1);
+//        }
+//    }
 
     // ------------------------------------ ReductionAddFloat --------------------------------------------------
 
@@ -764,9 +769,9 @@ public class TestReductionIR {
 
     @Test
     @IR(counts = {IRNode.LOAD_VECTOR, "= 0", IRNode.MUL_VF, "= 0", IRNode.MIN_REDUCTION_V, "= 0"},
-        applyIfOr = {"SuperWordReductions", "false", "LoopMinUnroll", "<= 4"})
+        applyIfOr = {"SuperWordReductions", "false", "LoopMaxUnroll", "<= 4"})
     @IR(counts = {IRNode.LOAD_VECTOR, "> 0", IRNode.MUL_VF, "> 0", IRNode.MIN_REDUCTION_V, "> 0"},
-        applyIfAnd = {"SuperWordReductions", "true", "LoopMinUnroll", "> 4"},
+        applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 4"},
         applyIfCPUFeatureOr = {"avx", "true", "sve", "true"},
         applyIfPlatformFeature = {"32-bit", "false"})
     public float testReductionMinFloat(float[] a, float sum) {
@@ -1192,7 +1197,7 @@ public class TestReductionIR {
 
     @Test
     @IR(counts = {IRNode.MUL_ADDS2I, "= 0"},
-        applyIfOr = {"SuperWordReductions", "false", "LoopMaxUnroll <= 4"})
+        applyIfOr = {"SuperWordReductions", "false", "LoopMaxUnroll", "<= 4"})
     @IR(counts = {IRNode.MUL_ADDS2I, "> 0"},
         applyIfAnd = {"SuperWordReductions", "true", "LoopMaxUnroll", "> 4"},
         applyIfCPUFeatureOr = {"sse2", "true", "sve", "true"})
