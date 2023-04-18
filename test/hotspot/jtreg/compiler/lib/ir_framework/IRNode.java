@@ -749,9 +749,14 @@ public class IRNode {
         beforeMatchingNameRegex(MUL_VI, "MulVI");
     }
 
+    public static final String MUL_ADDS2I = PREFIX + "MUL_ADDS2I" + POSTFIX;
+    static {
+        superWordNodes(MUL_ADDS2I, "MulAddS2I");
+    }
+
     public static final String MUL_REDUCTION_V = PREFIX + "MUL_REDUCTION_V" + POSTFIX;
     static {
-        beforeMatchingNameRegex(MUL_REDUCTION_V, "MulReduction(B|S|C|I|L|F|D");
+        beforeMatchingNameRegex(MUL_REDUCTION_V, "MulReduction(B|S|C|I|L|F|D)");
     }
 
     public static final String MUL_REDUCTION_VD = PREFIX + "MUL_REDUCTION_VD" + POSTFIX;

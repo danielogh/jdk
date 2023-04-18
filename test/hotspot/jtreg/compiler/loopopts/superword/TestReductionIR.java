@@ -79,33 +79,27 @@
 */
 
 // TODO:
-// int / long: min, max - seems to be broken?
-// SumRedAbsNeg_Double.java, SumRedAbsNeg_Float.java - TODO WIP
-// Vec_MulAddS2I.java ?
-// Split scenarios into different runs/tests?
-// Lower than SVE? Rules for other platforms?
-// Remove the unroll 2 scenario, add another one instead?
-// Extend randomize inputs?
-// Separate test descriptions instead of scenarios?
-// Test methods not using shared fields / data structures
-// more types (byte, char, short), more operations (And, Or, Min, Max).
+// int / long: min, max - seems to be broken? -- externally blocked
+// SumRedAbsNeg_Double.java, SumRedAbsNeg_Float.java -- Double not working in original test
+// Vec_MulAddS2I.java ? -- added
+// Lower than SVE? Rules for other platforms? -- cant test, skipping
+// Remove the unroll 2 scenario, add another one instead? -- removed
+// Extend randomize inputs? -- no action, would be nice to try different formulas for reductions.
+// Separate test descriptions instead of scenarios? -- done.
+// Test methods not using shared fields / data structures -- mostly done, kept finals
+// more types (byte, char, short) -- not working good, skipping
+// tweak SSE/AVX values -- done
 
 /* Tested reductions:
    - Add
      + (DoubleSqrt)
-     + AbsNeg
+     + AbsNeg (not working for double)
    - Mul
    - Xor
    - And
    - Or
-   - Min
-   - Max
-   for
-   Double
-   Float
-   Int
-   Long
-   TODO byte, char, short
+   - Min/Max : broken for int, not working for Long
+   byte, char, short not working good. Skipping for now.
 */
 
 
