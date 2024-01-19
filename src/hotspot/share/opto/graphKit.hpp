@@ -181,7 +181,7 @@ class GraphKit : public Phase {
   void set_map_clone(SafePointNode* m);
 
   // Tell if the compilation is failing.
-  bool failing() const { return C->failing(); }
+  bool failing() const { return C->failing(true); } // skip=true to avoid cascading effects
 
   // Set _map to null, signalling a stop to further bytecode execution.
   // Preserve the map intact for future use, and return it back to the caller.

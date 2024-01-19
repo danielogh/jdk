@@ -806,12 +806,21 @@ private:
   void sort_expensive_nodes();
 
   // Compilation environment.
-  Arena*      comp_arena()           { return &_comp_arena; }
-  ciEnv*      env() const            { return _env; }
-  CompileLog* log() const            { return _log; }
-  bool        failing() const        { return _env->failing() || _failure_reason != nullptr; }
-  const char* failure_reason() const { return (_env->failing()) ? _env->failure_reason() : _failure_reason; }
+  Arena*      comp_arena()             { return &_comp_arena; }
+  ciEnv*      env() const              { return _env; }
+  CompileLog* log() const              { return _log; }
+  bool        failing_internal() const { return (env()->failing() || _failure_reason != nullptr); }
+  const char* failure_reason() const   { return (_env->failing()) ? _env->failure_reason() : _failure_reason; }
   const CompilationFailureInfo* first_failure_details() const { return _first_failure_details; }
+
+  bool failing(bool skip=false) {
+    if (failing_internal()) {return true; }
+    if (!StressBailout || skip) {return false; }
+    int r = os::random();
+    if (r % StressBailoutInterval) {return false; }
+    record_failure("StressBailout");
+    return true;
+  }
 
   bool failure_reason_is(const char* r) const {
     return (r == _failure_reason) || (r != nullptr && _failure_reason != nullptr && strcmp(r, _failure_reason) == 0);
