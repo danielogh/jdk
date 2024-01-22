@@ -304,6 +304,11 @@ void PhaseAggressiveCoalesce::insert_copies( Matcher &matcher ) {
                 }
                 return;
               }
+
+	      if (StressBailout && C->failing()) {
+	        return;
+              }
+
               const RegMask *rm = C->matcher()->idealreg2spillmask[ireg];
               copy = new MachSpillCopyNode(MachSpillCopyNode::PhiInput, m, *rm, *rm);
               // Find a good place to insert.  Kinda tricky, use a subroutine

@@ -44,6 +44,10 @@ void C2CodeStubList::emit(CodeBuffer& cb) {
       return;
     }
 
+    if (StressBailout && ciEnv::current()->failing()) {
+      return;
+    }
+
     DEBUG_ONLY(int size_before = cb.insts_size();)
 
     stub->emit(masm);

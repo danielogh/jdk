@@ -2447,6 +2447,10 @@ bool SuperWord::output() {
           return false; // bailout
         }
 
+	if (StressBailout && C->failing()) {
+	  return false; // val == nullptr
+	}
+
         Node* ctl = n->in(MemNode::Control);
         Node* mem = first->in(MemNode::Memory);
         Node* adr = first->in(MemNode::Address);
@@ -2585,6 +2589,11 @@ bool SuperWord::output() {
             C->record_failure(C2Compiler::retry_no_superword());
             return false; // bailout
           }
+
+	  if (StressBailout && C->failing()) {
+	    return false; // in1 == nullptr
+	  }
+
         }
         Node* in2 = vector_opd(p, 2);
         if (in2 == nullptr) {
@@ -2592,6 +2601,11 @@ bool SuperWord::output() {
           C->record_failure(C2Compiler::retry_no_superword());
           return false; // bailout
         }
+
+	if (StressBailout && C->failing()) {
+	  return false; // in2 == nullptr
+	}
+
         if (in1->Opcode() == Op_Replicate && (node_isa_reduction == false) && (n->is_Add() || n->is_Mul())) {
           // Move invariant vector input into second position to avoid register spilling.
           Node* tmp = in1;
@@ -2668,6 +2682,10 @@ bool SuperWord::output() {
         assert(false, "got null node instead of vector node");
         C->record_failure(C2Compiler::retry_no_superword());
         return false; // bailout
+      }
+
+      if (StressBailout && C->failing()) {
+        return false; // Unhandled scalar opcode || null node instead of vector node
       }
 
 #ifdef ASSERT

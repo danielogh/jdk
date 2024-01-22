@@ -1426,6 +1426,10 @@ void PhaseCFG::schedule_late(VectorSet &visited, Node_Stack &stack) {
       return;
     }
 
+    if (StressBailout && C->failing()) {
+      return; // early > LCA
+    }
+
     if (self->is_memory_writer()) {
       // If the LCA of a memory writer is a descendant of its home loop, hoist
       // it into a valid placement.

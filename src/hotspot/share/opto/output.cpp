@@ -1355,6 +1355,11 @@ CodeBuffer* PhaseOutput::init_buffer() {
     C->record_failure("CodeCache is full");
     return nullptr;
   }
+
+  if (StressBailout && C->failing()) {
+    return nullptr;
+  }
+
   // Configure the code buffer.
   cb->initialize_consts_size(const_req);
   cb->initialize_stubs_size(stub_req);
@@ -1426,6 +1431,10 @@ void PhaseOutput::fill_buffer(CodeBuffer* cb, uint* blk_starts) {
   if (C->has_mach_constant_base_node()) {
     if (!constant_table().emit(*cb)) {
       C->record_failure("consts section overflow");
+      return;
+    }
+
+    if (StressBailout && C->failing()){
       return;
     }
   }
@@ -1532,6 +1541,11 @@ void PhaseOutput::fill_buffer(CodeBuffer* cb, uint* blk_starts) {
             C->record_failure("CodeCache is full");
             return;
           }
+
+	  if (StressBailout && C->failing()) {
+	    return;
+	  }
+
           nop->emit(*cb, C->regalloc());
           cb->flush_bundle(true);
           current_offset = cb->insts_size();
@@ -1685,6 +1699,10 @@ void PhaseOutput::fill_buffer(CodeBuffer* cb, uint* blk_starts) {
         return;
       }
 
+      if (StressBailout && C->failing()) {
+	return;
+      }
+
       // Save the offset for the listing
 #if defined(SUPPORT_OPTO_ASSEMBLY)
       if ((node_offsets != nullptr) && (n->_idx < node_offset_limit)) {
@@ -1832,6 +1850,10 @@ void PhaseOutput::fill_buffer(CodeBuffer* cb, uint* blk_starts) {
     return;
   }
 
+  if (StressBailout && C->failing()) {
+    return;
+  }
+
   BarrierSetC2* bs = BarrierSet::barrier_set()->barrier_set_c2();
   bs->emit_stubs(*cb);
   if (C->failing())  return;
@@ -1871,6 +1893,10 @@ void PhaseOutput::fill_buffer(CodeBuffer* cb, uint* blk_starts) {
   // One last check for failed CodeBuffer::expand:
   if ((cb->blob() == nullptr) || (!CompileBroker::should_compile_new_jobs())) {
     C->record_failure("CodeCache is full");
+    return;
+  }
+
+  if (StressBailout && C->failing()) {
     return;
   }
 
@@ -3305,6 +3331,10 @@ void PhaseOutput::init_scratch_buffer_blob(int const_size) {
     if (scratch_buffer_blob() == nullptr) {
       // Let CompilerBroker disable further compilations.
       C->record_failure("Not enough space for scratch buffer in CodeCache");
+      return;
+    }
+
+    if (StressBailout && C->failing()) {
       return;
     }
   }

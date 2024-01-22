@@ -311,6 +311,11 @@ Node* clone_node(Node* def, Block *b, Compile* C) {
     }
     return 0;
   }
+
+  if (StressBailout && C->failing()) {
+    return 0; // def->needs_anti_dependence_check()
+  }
+
   return def->clone();
 }
 

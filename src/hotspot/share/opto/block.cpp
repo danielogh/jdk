@@ -1142,6 +1142,10 @@ void PhaseCFG::postalloc_expand(PhaseRegAlloc* _ra) {
           return;
         }
 
+	if (StressBailout && C->failing()) {
+	  return; // C->unique() + 40 >= _ra->node_regs_max_index()
+	}
+
         // Emit (i.e. generate new nodes).
         n->as_Mach()->postalloc_expand(&new_nodes, _ra);
 

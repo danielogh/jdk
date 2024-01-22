@@ -699,6 +699,10 @@ void ConnectionGraph::reduce_phi_on_safepoints(PhiNode* ophi, Unique_Node_List* 
         return;
       }
 
+      if (StressBailout && _compile->failing()) {
+        return; // sobj == nullptr
+      }
+
       // Now make a pass over the debug information replacing any references
       // to the allocated object with "sobj"
       Node* ccpp = alloc->result_cast();
@@ -758,6 +762,10 @@ void ConnectionGraph::reduce_phi(PhiNode* ophi) {
       _compile->record_failure(C2Compiler::retry_no_reduce_allocation_merges());
       return;
     }
+
+    if (StressBailout && _compile->failing()) {
+      return; // !use->is_SafePoint()
+    }
   }
 
   if (safepoints.size() > 0) {
@@ -783,7 +791,7 @@ void ConnectionGraph::verify_ram_nodes(Compile* C, Node* root) {
         if (merge->in(i) != nullptr && !merge->in(i)->is_top() && !merge->in(i)->is_SafePointScalarObject()) {
           assert(false, "SafePointScalarMerge inputs should be null/top or SafePointScalarObject.");
           C->record_failure(C2Compiler::retry_no_reduce_allocation_merges());
-        }
+        }	  
       }
 
       // Validate users of merge
@@ -802,6 +810,8 @@ void ConnectionGraph::verify_ram_nodes(Compile* C, Node* root) {
         }
       }
     }
+
+    if (StressBailout && C->failing()) {; } // Do nothing.
 
     for (DUIterator_Fast imax, i = n->fast_outs(imax); i < imax; i++) {
       Node* m = n->fast_out(i);
@@ -3222,6 +3232,11 @@ PhiNode *ConnectionGraph::create_split_phi(PhiNode *orig_phi, int alias_idx, Gro
     }
     return nullptr;
   }
+
+  if (StressBailout && C->failing()) {
+    return nullptr; // node limit
+  }
+
   orig_phi_worklist.append_if_missing(orig_phi);
   const TypePtr *atype = C->get_adr_type(alias_idx);
   result = PhiNode::make(orig_phi->in(0), nullptr, Type::MEMORY, atype);
@@ -3799,6 +3814,11 @@ void ConnectionGraph::split_unique_types(GrowableArray<Node *>  &alloc_worklist,
         _compile->record_failure(_invocation > 0 ? C2Compiler::retry_no_iterative_escape_analysis() : C2Compiler::retry_no_escape_analysis());
         return;
       }
+
+      if (StressBailout && _compile->failing()) {
+	return; // jobj == nulptr || jobj == phantom_obj
+      }
+
       Node *base = get_map(jobj->idx());  // CheckCastPP node
       if (!split_AddP(n, base)) continue; // wrong type from dead path
     } else if (n->is_Phi() ||
@@ -3861,6 +3881,11 @@ void ConnectionGraph::split_unique_types(GrowableArray<Node *>  &alloc_worklist,
           continue; // Skip dead path with different type
         }
       }
+
+      if (StressBailout && _compile->failing()) {
+        return; // jobj == nullptr || jobj == phantom_obj
+      }
+
     } else {
       debug_only(n->dump();)
       assert(false, "EA: unexpected node");
