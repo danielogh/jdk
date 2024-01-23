@@ -46,6 +46,10 @@
 #include "runtime/vmThread.hpp"
 #include "utilities/ticks.hpp"
 
+
+#include "classfile/javaClasses.hpp"
+#include "runtime/handles.hpp"
+
 class AbstractLockNode;
 class AddPNode;
 class Block;
@@ -818,6 +822,9 @@ private:
     if (!StressBailout || skip) {return false; }
     int r = os::random();
     if (r % StressBailoutInterval) {return false; }
+      //tty->print_cr("printing stack");
+      //JavaThread::current()->print_jni_stack();
+      //tty->print_cr("stack printed");
     record_failure("StressBailout");
     return true;
   }
