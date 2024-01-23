@@ -147,6 +147,9 @@ OptoReg::Name Matcher::warp_incoming_stk_arg( VMReg reg ) {
       C->record_method_not_compilable("unsupported incoming calling sequence");
       return OptoReg::Bad;
     }
+    if (StressBailout && C->failing()) {
+      return OptoReg::Bad;
+    }
     return warped;
   }
   return OptoReg::as_OptoReg(reg);
@@ -1261,6 +1264,9 @@ OptoReg::Name Matcher::warp_outgoing_stk_arg( VMReg reg, OptoReg::Name begin_out
       C->record_method_not_compilable("unsupported calling sequence");
       return OptoReg::Bad;
     }
+    if (StressBailout && C->failing()) {
+      return OptoReg::Bad;
+    }
     return warped;
   }
   return OptoReg::as_OptoReg(reg);
@@ -1642,6 +1648,10 @@ Node* Matcher::Label_Root(const Node* n, State* svec, Node* control, Node*& mem)
     C->record_method_not_compilable("Out of stack space, increase MaxLabelRootDepth");
     return nullptr;
   }
+  if (StressBailout && C->failing()) {
+    return nullptr;
+  } 
+
   uint care = 0;                // Edges matcher cares about
   uint cnt = n->req();
   uint i = 0;

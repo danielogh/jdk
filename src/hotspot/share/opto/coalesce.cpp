@@ -350,6 +350,9 @@ void PhaseAggressiveCoalesce::insert_copies( Matcher &matcher ) {
                 C->record_method_not_compilable("attempted to spill a non-spillable item");
                 return;
               }
+	      if (StressBailout && C->failing()) {
+	        return;
+              }
               const RegMask *rm = C->matcher()->idealreg2spillmask[ireg];
               copy = new MachSpillCopyNode(MachSpillCopyNode::TwoAddress, m, *rm, *rm);
               // Insert the copy in the basic block, just before us
@@ -403,6 +406,9 @@ void PhaseAggressiveCoalesce::insert_copies( Matcher &matcher ) {
                        inp->_idx, inp->Name(), ireg, MachSpillCopyNode::spill_type(MachSpillCopyNode::DebugUse));
                 C->record_method_not_compilable("attempted to spill a non-spillable item");
                 return;
+              }
+	      if (StressBailout && C->failing()) {
+	        return;
               }
               const RegMask *rm = C->matcher()->idealreg2spillmask[ireg];
               Node* copy = new MachSpillCopyNode(MachSpillCopyNode::DebugUse, inp, *rm, *rm);

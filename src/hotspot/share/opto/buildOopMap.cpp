@@ -258,6 +258,9 @@ OopMap *OopFlow::build_oop_map( Node *n, int max_reg, PhaseRegAlloc *regalloc, i
         regalloc->C->record_method_not_compilable(ss.as_string());
         continue;
       }
+      if (StressBailout && C->failing()) {
+	 continue;
+      }
       if( t->is_ptr()->_offset == 0 ) { // Not derived?
         if( mcall ) {
           // Outgoing argument GC mask responsibility belongs to the callee,
@@ -328,6 +331,9 @@ OopMap *OopFlow::build_oop_map( Node *n, int max_reg, PhaseRegAlloc *regalloc, i
         assert(false, "%s", ss.as_string());
         regalloc->C->record_method_not_compilable(ss.as_string());
         continue;
+      }
+      if (StressBailout && C->failing()) {
+	continue;
       }
       if( mcall ) {
           // Outgoing argument GC mask responsibility belongs to the callee,

@@ -90,6 +90,10 @@ void PhaseCFG::build_dominator_tree() {
     C->record_method_not_compilable("unreachable loop");
     return;
   }
+  if (StressBailout && C->failing()) {
+    return; // dfsnum -1 != number_of_blocks()
+  }
+
   _blocks._cnt = number_of_blocks();
 
   // Tarjan is using 1-based arrays, so these are some initialize flags

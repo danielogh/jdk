@@ -4588,6 +4588,10 @@ void PhaseIdealLoop::build_and_optimize() {
     return;
   }
 
+  if (StressBailout && C->failing()) {
+    return; // !has_node(C->root())
+  }
+
   BarrierSetC2* bs = BarrierSet::barrier_set()->barrier_set_c2();
   // Nothing to do, so get out
   bool stop_early = !C->has_loops() && !skip_loop_opts && !do_split_ifs && !do_max_unroll && !_verify_me &&
@@ -5541,6 +5545,9 @@ int PhaseIdealLoop::build_loop_tree_impl( Node *n, int pre_order ) {
           C->record_method_not_compilable("unhandled CFG detected during loop optimization");
           return pre_order;
         }
+	if (StressBailout && C->failing()) {
+          return pre_order;
+	}
       }
     }
     if (!_verify_only) {
@@ -6371,6 +6378,9 @@ void PhaseIdealLoop::build_loop_late_post_work(Node *n, bool pinned) {
       assert(false, "Bad graph detected in build_loop_late");
 #endif
       C->record_method_not_compilable("Bad graph detected in build_loop_late");
+      return;
+    }
+    if (StressBailout && C->failing()) {
       return;
     }
     // Find least loop nesting depth

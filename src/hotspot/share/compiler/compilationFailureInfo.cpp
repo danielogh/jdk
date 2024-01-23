@@ -46,7 +46,8 @@ CompilationFailureInfo::CompilationFailureInfo(const char* failure_reason) :
   _stack(2),
   _failure_reason(os::strdup(failure_reason)),
   _elapsed_seconds(os::elapsedTime()),
-  _compile_id(ciEnv::current()->task()->compile_id())
+  _compile_id(-1)
+  //_compile_id(ciEnv::current()->task()->compile_id())
 {}
 
 CompilationFailureInfo::~CompilationFailureInfo() {

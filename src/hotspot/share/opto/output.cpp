@@ -3001,6 +3001,9 @@ void Scheduling::anti_do_def( Block *b, Node *def, OptoReg::Name def_reg, int is
       _cfg->C->record_method_not_compilable("too many D-U pinch points");
       return;
     }
+    if (StressBailout && C->failing()) {
+      return; // pinch->_idx >= _regalloc->node_regs_max_index()
+    }
     _cfg->map_node_to_block(pinch, b);      // Pretend it's valid in this block (lazy init)
     _reg_node.map(def_reg,pinch); // Record pinch-point
     //regalloc()->set_bad(pinch->_idx); // Already initialized this way.

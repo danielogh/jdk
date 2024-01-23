@@ -1213,6 +1213,10 @@ Block* PhaseCFG::hoist_to_cheaper_block(Block* LCA, Block* early, Node* self) {
       return least;
     }
 
+    if (StressBailout && C->failing()) {
+      return least;
+    }
+
     // Don't hoist machine instructions to the root basic block
     if (mach && LCA == root_block)
       break;
@@ -1508,6 +1512,9 @@ void PhaseCFG::global_code_motion() {
     C->record_method_not_compilable("early schedule failed");
     return;
   }
+  if (StressBailout && C->failing()) {
+    return;
+  }
 
   // Build Def-Use edges.
   // Compute the latency information (via backwards walk) for all the
@@ -1608,6 +1615,10 @@ void PhaseCFG::global_code_motion() {
         assert(false, "local schedule failed");
         C->record_method_not_compilable("local schedule failed");
       }
+      _regalloc = nullptr;
+      return;
+    }
+    if (StressBailout && C->failing()) {
       _regalloc = nullptr;
       return;
     }

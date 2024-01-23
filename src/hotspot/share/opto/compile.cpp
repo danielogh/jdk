@@ -784,6 +784,7 @@ Compile::Compile( ciEnv* ci_env, ciMethod* target, int osr_bci,
       record_method_not_compilable(ss.as_string());
       return;
     }
+    // Just did a failing check, nothing to stress.
 
     gvn.set_type(root(), root()->bottom_type());
 
@@ -795,6 +796,8 @@ Compile::Compile( ciEnv* ci_env, ciMethod* target, int osr_bci,
       record_method_not_compilable(ss.as_string());
       return;
     }
+    // This part of code might have cascading effects when bailout-stressed.
+    // Leaving it for now.
     GraphKit kit(jvms);
 
     if (!kit.stopped()) {
@@ -1126,7 +1129,7 @@ void Compile::Init(bool aliasing) {
 //---------------------------init_start----------------------------------------
 // Install the StartNode on this compile object.
 void Compile::init_start(StartNode* s) {
-  if (failing())
+  if (failing_internal()) // Might be cascading, not using stress option here.
     return; // already failing
   assert(s == start(), "");
 }
@@ -4011,6 +4014,9 @@ bool Compile::final_graph_reshaping() {
     record_method_not_compilable("trivial infinite loop");
     return true;
   }
+  if (StressBailout && C->failing()) {
+    return true;
+  }
 
   // Expensive nodes have their control input set to prevent the GVN
   // from freely commoning them. There's no GVN beyond this point so
@@ -4079,6 +4085,9 @@ bool Compile::final_graph_reshaping() {
         record_method_not_compilable("malformed control flow");
         return true;            // Not all targets reachable!
       }
+      if (StressBailout && C->failing()) {
+	return true;
+      }
     } else if (n->is_PCTable() && n->in(0) && n->in(0)->in(0) && n->in(0)->in(0)->is_Call()) {
       CallNode* call = n->in(0)->in(0)->as_Call();
       if (call->entry_point() == OptoRuntime::new_array_Java() ||
@@ -4092,12 +4101,15 @@ bool Compile::final_graph_reshaping() {
     }
     // Check that I actually visited all kids.  Unreached kids
     // must be infinite loops.
-    for (DUIterator_Fast jmax, j = n->fast_outs(jmax); j < jmax; j++)
+    for (DUIterator_Fast jmax, j = n->fast_outs(jmax); j < jmax; j++) {
       if (!frc._visited.test(n->fast_out(j)->_idx)) {
         record_method_not_compilable("infinite loop");
         return true;            // Found unvisited kid; must be unreach
       }
-
+      if (StressBailout && C->failing()) {
+	return true;
+      }
+    }
     // Here so verification code in final_graph_reshaping_walk()
     // always see an OuterStripMinedLoopEnd
     if (n->is_OuterStripMinedLoopEnd() || n->is_LongCountedLoopEnd()) {
