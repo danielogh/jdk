@@ -39,7 +39,7 @@ class CompilationFailureInfo : public CHeapObj<mtCompiler> {
   NativeCallStack _stack;
   char* const _failure_reason;
   const double _elapsed_seconds;
-  const int _compile_id;
+  const int _compile_id; // TODO
 public:
   CompilationFailureInfo(const char* failure_reason);
   ~CompilationFailureInfo();

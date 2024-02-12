@@ -67,10 +67,11 @@
                                                                             \
   product(bool, StressBailout, false, DIAGNOSTIC,                           \
          "Perform bailouts randomly at C2 failing() checks.")               \
+          constraint(StressBailoutConstraintFunc, AfterErgo)                \
                                                                             \
-  product(int, StressBailoutInterval, 10000, DIAGNOSTIC,                    \
+  product(uint, StressBailoutInterval, 10000, DIAGNOSTIC,                   \
           "Stress bailout every n:th time on average")                      \
-          range(1, max_jint)                                                \
+          range(1, max_juint)                                               \
                                                                             \
   develop(intx, OptoPrologueNops, 0,                                        \
           "Insert this many extra nop instructions "                        \

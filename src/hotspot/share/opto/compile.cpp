@@ -754,6 +754,7 @@ Compile::Compile( ciEnv* ci_env, ciMethod* target, int osr_bci,
       StartNode* s = new StartOSRNode(root(), domain);
       initial_gvn()->set_type_bottom(s);
       init_start(s);
+      if (C->failing()) {return; } //init_start
       cg = CallGenerator::for_osr(method(), entry_bci());
     } else {
       // Normal case.
@@ -761,6 +762,7 @@ Compile::Compile( ciEnv* ci_env, ciMethod* target, int osr_bci,
       StartNode* s = new StartNode(root(), tf()->domain());
       initial_gvn()->set_type_bottom(s);
       init_start(s);
+      if (C->failing()) {return; } //init_start
       if (method()->intrinsic_id() == vmIntrinsics::_Reference_get) {
         // With java.lang.ref.reference.get() we must go through the
         // intrinsic - even when get() is the root
@@ -793,7 +795,7 @@ Compile::Compile( ciEnv* ci_env, ciMethod* target, int osr_bci,
       assert(failure_reason() != nullptr, "expect reason for parse failure");
       stringStream ss;
       ss.print("method parse failed: %s", failure_reason());
-      record_method_not_compilable(ss.as_string());
+      record_method_not_compilable(ss.as_string(), true);
       return;
     }
     // This part of code might have cascading effects when bailout-stressed.
@@ -4398,7 +4400,7 @@ void Compile::verify_graph_edges(bool no_dead_code) {
 // to backtrack and retry without subsuming loads.  Other than this backtracking
 // behavior, the Compile's failure reason is quietly copied up to the ciEnv
 // by the logic in C2Compiler.
-void Compile::record_failure(const char* reason) {
+void Compile::record_failure(const char* reason, bool skip) {
   if (log() != nullptr) {
     log()->elem("failure reason='%s' phase='compile'", reason);
   }
@@ -4407,6 +4409,10 @@ void Compile::record_failure(const char* reason) {
     _failure_reason = reason;
     if (CaptureBailoutInformation) {
       _first_failure_details = new CompilationFailureInfo(reason);
+    }
+  } else {
+    if (StressBailout && !skip)  {
+        guarantee(false, "should have handled previous failure.");
     }
   }
 

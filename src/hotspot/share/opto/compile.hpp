@@ -813,18 +813,25 @@ private:
   Arena*      comp_arena()             { return &_comp_arena; }
   ciEnv*      env() const              { return _env; }
   CompileLog* log() const              { return _log; }
-  bool        failing_internal() const { return (env()->failing() || _failure_reason != nullptr); }
+  bool        failing_internal() const { return _env->failing() || _failure_reason != nullptr; }
   const char* failure_reason() const   { return (_env->failing()) ? _env->failure_reason() : _failure_reason; }
   const CompilationFailureInfo* first_failure_details() const { return _first_failure_details; }
 
   bool failing(bool skip=false) {
-    if (failing_internal()) {return true; }
+    if (failing_internal()) {
+      return true;
+    }
     if (!StressBailout || skip) {return false; }
+    return fail_randomly(StressBailoutInterval);
+  }
+
+  bool fail_randomly(uint invprob) {
+    if (invprob < 1) {
+      guarantee(false, "argument error");
+      return false;
+    }
     int r = os::random();
-    if (r % StressBailoutInterval) {return false; }
-      //tty->print_cr("printing stack");
-      //JavaThread::current()->print_jni_stack();
-      //tty->print_cr("stack printed");
+    if (r % invprob) {return false; }
     record_failure("StressBailout");
     return true;
   }
@@ -833,11 +840,11 @@ private:
     return (r == _failure_reason) || (r != nullptr && _failure_reason != nullptr && strcmp(r, _failure_reason) == 0);
   }
 
-  void record_failure(const char* reason);
-  void record_method_not_compilable(const char* reason) {
+  void record_failure(const char* reason, bool skip=false);
+  void record_method_not_compilable(const char* reason, bool skip=false) {
     env()->record_method_not_compilable(reason);
     // Record failure reason.
-    record_failure(reason);
+    record_failure(reason, skip);
   }
   bool check_node_count(uint margin, const char* reason) {
     if (oom()) {
