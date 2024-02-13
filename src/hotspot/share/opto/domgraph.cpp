@@ -90,7 +90,7 @@ void PhaseCFG::build_dominator_tree() {
     C->record_method_not_compilable("unreachable loop");
     return;
   }
-  if (StressBailout && C->failing()) {
+  if (StressBailout && C->fail_randomly(1000)) {
     return; // dfsnum -1 != number_of_blocks()
   }
 

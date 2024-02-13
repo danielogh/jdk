@@ -1356,7 +1356,7 @@ CodeBuffer* PhaseOutput::init_buffer() {
     return nullptr;
   }
 
-  if (StressBailout && C->failing()) {
+  if (StressBailout && C->fail_randomly(1000)) {
     return nullptr;
   }
 
@@ -1434,7 +1434,7 @@ void PhaseOutput::fill_buffer(CodeBuffer* cb, uint* blk_starts) {
       return;
     }
 
-    if (StressBailout && C->failing()){
+    if (StressBailout && C->fail_randomly(1000)){
       return;
     }
   }
@@ -1542,7 +1542,7 @@ void PhaseOutput::fill_buffer(CodeBuffer* cb, uint* blk_starts) {
             return;
           }
 
-	  if (StressBailout && C->failing()) {
+	  if (StressBailout && C->fail_randomly(1000)) {
 	    return;
 	  }
 
@@ -1699,7 +1699,7 @@ void PhaseOutput::fill_buffer(CodeBuffer* cb, uint* blk_starts) {
         return;
       }
 
-      if (StressBailout && C->failing()) {
+      if (StressBailout && C->fail_randomly(1000)) {
 	return;
       }
 
@@ -1850,7 +1850,7 @@ void PhaseOutput::fill_buffer(CodeBuffer* cb, uint* blk_starts) {
     return;
   }
 
-  if (StressBailout && C->failing()) {
+  if (StressBailout && C->fail_randomly(1000)) {
     return;
   }
 
@@ -1896,7 +1896,7 @@ void PhaseOutput::fill_buffer(CodeBuffer* cb, uint* blk_starts) {
     return;
   }
 
-  if (StressBailout && C->failing()) {
+  if (StressBailout && C->fail_randomly(1000)) {
     return;
   }
 
@@ -3001,7 +3001,7 @@ void Scheduling::anti_do_def( Block *b, Node *def, OptoReg::Name def_reg, int is
       _cfg->C->record_method_not_compilable("too many D-U pinch points");
       return;
     }
-    if (StressBailout && C->failing()) {
+    if (StressBailout && C->fail_randomly(1000)) {
       return; // pinch->_idx >= _regalloc->node_regs_max_index()
     }
     _cfg->map_node_to_block(pinch, b);      // Pretend it's valid in this block (lazy init)
@@ -3337,7 +3337,7 @@ void PhaseOutput::init_scratch_buffer_blob(int const_size) {
       return;
     }
 
-    if (StressBailout && C->failing()) {
+    if (StressBailout && C->fail_randomly(1000)) {
       return;
     }
   }

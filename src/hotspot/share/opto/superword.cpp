@@ -2447,7 +2447,7 @@ bool SuperWord::output() {
           return false; // bailout
         }
 
-	if (StressBailout && C->failing()) {
+	if (StressBailout && C->fail_randomly(1000)) {
 	  return false; // val == nullptr
 	}
 
@@ -2590,7 +2590,7 @@ bool SuperWord::output() {
             return false; // bailout
           }
 
-	  if (StressBailout && C->failing()) {
+	  if (StressBailout && C->fail_randomly(1000)) {
 	    return false; // in1 == nullptr
 	  }
 
@@ -2602,7 +2602,7 @@ bool SuperWord::output() {
           return false; // bailout
         }
 
-	if (StressBailout && C->failing()) {
+	if (StressBailout && C->fail_randomly(1000)) {
 	  return false; // in2 == nullptr
 	}
 
@@ -2684,7 +2684,7 @@ bool SuperWord::output() {
         return false; // bailout
       }
 
-      if (StressBailout && C->failing()) {
+      if (StressBailout && C->fail_randomly(1000)) {
         return false; // Unhandled scalar opcode || null node instead of vector node
       }
 

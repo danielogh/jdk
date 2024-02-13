@@ -4588,7 +4588,7 @@ void PhaseIdealLoop::build_and_optimize() {
     return;
   }
 
-  if (StressBailout && C->failing()) {
+  if (StressBailout && C->fail_randomly(1000)) {
     return; // !has_node(C->root())
   }
 
@@ -5547,7 +5547,7 @@ int PhaseIdealLoop::build_loop_tree_impl( Node *n, int pre_order ) {
           C->record_method_not_compilable("unhandled CFG detected during loop optimization");
           return pre_order;
         }
-	if (StressBailout && C->failing()) {
+	if (StressBailout && C->fail_randomly(1000)) {
           return pre_order;
 	}
       }
@@ -6382,7 +6382,7 @@ void PhaseIdealLoop::build_loop_late_post_work(Node *n, bool pinned) {
       C->record_method_not_compilable("Bad graph detected in build_loop_late");
       return;
     }
-    if (StressBailout && C->failing()) {
+    if (StressBailout && C->fail_randomly(1000)) {
       return;
     }
     // Find least loop nesting depth

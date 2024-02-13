@@ -258,7 +258,7 @@ OopMap *OopFlow::build_oop_map( Node *n, int max_reg, PhaseRegAlloc *regalloc, i
         regalloc->C->record_method_not_compilable(ss.as_string());
         continue;
       }
-      if (StressBailout && C->failing()) {
+      if (StressBailout && C->fail_randomly(1000)) {
 	 continue;
       }
       if( t->is_ptr()->_offset == 0 ) { // Not derived?
@@ -332,7 +332,7 @@ OopMap *OopFlow::build_oop_map( Node *n, int max_reg, PhaseRegAlloc *regalloc, i
         regalloc->C->record_method_not_compilable(ss.as_string());
         continue;
       }
-      if (StressBailout && C->failing()) {
+      if (StressBailout && C->fail_randomly(1000)) {
 	continue;
       }
       if( mcall ) {

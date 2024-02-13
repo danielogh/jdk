@@ -811,7 +811,7 @@ void ConnectionGraph::verify_ram_nodes(Compile* C, Node* root) {
       }
     }
 
-    if (StressBailout && C->failing()) {; } // Do nothing.
+    if (StressBailout && C->fail_randomly(1000)) {; } // Do nothing.
 
     for (DUIterator_Fast imax, i = n->fast_outs(imax); i < imax; i++) {
       Node* m = n->fast_out(i);
@@ -3233,7 +3233,7 @@ PhiNode *ConnectionGraph::create_split_phi(PhiNode *orig_phi, int alias_idx, Gro
     return nullptr;
   }
 
-  if (StressBailout && C->failing()) {
+  if (StressBailout && C->fail_randomly(1000)) {
     return nullptr; // node limit
   }
 

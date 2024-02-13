@@ -1678,7 +1678,7 @@ void PhaseIdealLoop::try_sink_out_of_loop(Node* n) {
           C->record_failure("no node with a side effect");
           return;
 	}
-        if (StressBailout && C->failing()) {
+        if (StressBailout && C->fail_randomly(1000)) {
           return; // Stress path "no node with a side effect"
         }
         Node* outer_loop_clone = nullptr;

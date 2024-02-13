@@ -1142,7 +1142,7 @@ void PhaseCFG::postalloc_expand(PhaseRegAlloc* _ra) {
           return;
         }
 
-	if (StressBailout && C->failing()) {
+	if (StressBailout && C->fail_randomly(1000)) {
 	  return; // C->unique() + 40 >= _ra->node_regs_max_index()
 	}
 

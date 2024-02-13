@@ -1213,7 +1213,7 @@ Block* PhaseCFG::hoist_to_cheaper_block(Block* LCA, Block* early, Node* self) {
       return least;
     }
 
-    if (StressBailout && C->failing()) {
+    if (StressBailout && C->fail_randomly(1000)) {
       return least;
     }
 
@@ -1430,7 +1430,7 @@ void PhaseCFG::schedule_late(VectorSet &visited, Node_Stack &stack) {
       return;
     }
 
-    if (StressBailout && C->failing()) {
+    if (StressBailout && C->fail_randomly(1000)) {
       return; // early > LCA
     }
 
@@ -1512,7 +1512,7 @@ void PhaseCFG::global_code_motion() {
     C->record_method_not_compilable("early schedule failed");
     return;
   }
-  if (StressBailout && C->failing()) {
+  if (StressBailout && C->fail_randomly(1000)) {
     return;
   }
 
@@ -1618,7 +1618,7 @@ void PhaseCFG::global_code_motion() {
       _regalloc = nullptr;
       return;
     }
-    if (StressBailout && C->failing()) {
+    if (StressBailout && C->fail_randomly(1000)) {
       _regalloc = nullptr;
       return;
     }

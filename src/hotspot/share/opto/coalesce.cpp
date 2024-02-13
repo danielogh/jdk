@@ -305,7 +305,7 @@ void PhaseAggressiveCoalesce::insert_copies( Matcher &matcher ) {
                 return;
               }
 
-	      if (StressBailout && C->failing()) {
+	      if (StressBailout && C->fail_randomly(1000)) {
 	        return;
               }
 
@@ -350,7 +350,7 @@ void PhaseAggressiveCoalesce::insert_copies( Matcher &matcher ) {
                 C->record_method_not_compilable("attempted to spill a non-spillable item");
                 return;
               }
-	      if (StressBailout && C->failing()) {
+	      if (StressBailout && C->fail_randomly(1000)) {
 	        return;
               }
               const RegMask *rm = C->matcher()->idealreg2spillmask[ireg];
@@ -407,7 +407,7 @@ void PhaseAggressiveCoalesce::insert_copies( Matcher &matcher ) {
                 C->record_method_not_compilable("attempted to spill a non-spillable item");
                 return;
               }
-	      if (StressBailout && C->failing()) {
+	      if (StressBailout && C->fail_randomly(1000)) {
 	        return;
               }
               const RegMask *rm = C->matcher()->idealreg2spillmask[ireg];

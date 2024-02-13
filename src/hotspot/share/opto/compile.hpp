@@ -46,9 +46,10 @@
 #include "runtime/vmThread.hpp"
 #include "utilities/ticks.hpp"
 
-
+/* Temporary includes, remove later */
 #include "classfile/javaClasses.hpp"
 #include "runtime/handles.hpp"
+/* End temporary includes */
 
 class AbstractLockNode;
 class AddPNode;
@@ -833,6 +834,7 @@ private:
     int r = os::random();
     if (r % invprob) {return false; }
     record_failure("StressBailout");
+    JavaThread::current()->print_jni_stack(); // TODO temporary statement, remove later.
     return true;
   }
 

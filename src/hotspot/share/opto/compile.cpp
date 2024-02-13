@@ -4016,7 +4016,7 @@ bool Compile::final_graph_reshaping() {
     record_method_not_compilable("trivial infinite loop");
     return true;
   }
-  if (StressBailout && C->failing()) {
+  if (StressBailout && C->fail_randomly(1000)) {
     return true;
   }
 
@@ -4087,7 +4087,7 @@ bool Compile::final_graph_reshaping() {
         record_method_not_compilable("malformed control flow");
         return true;            // Not all targets reachable!
       }
-      if (StressBailout && C->failing()) {
+      if (StressBailout && C->fail_randomly(1000)) {
 	return true;
       }
     } else if (n->is_PCTable() && n->in(0) && n->in(0)->in(0) && n->in(0)->in(0)->is_Call()) {
@@ -4108,7 +4108,7 @@ bool Compile::final_graph_reshaping() {
         record_method_not_compilable("infinite loop");
         return true;            // Found unvisited kid; must be unreach
       }
-      if (StressBailout && C->failing()) {
+      if (StressBailout && C->fail_randomly(1000)) {
 	return true;
       }
     }

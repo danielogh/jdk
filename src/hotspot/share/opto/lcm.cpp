@@ -1202,7 +1202,7 @@ bool PhaseCFG::schedule_local(Block* block, GrowableArray<int>& ready_cnt, Vecto
     return false;
   }
 
-  if (StressBailout && C->failing()) {
+  if (StressBailout && C->fail_randomly(1000)) {
     return false; // case phi_cnt != block->end_idx() 
   }
 

@@ -68,7 +68,7 @@ Node *PhaseChaitin::get_spillcopy_wide(MachSpillCopyNode::SpillType spill_type, 
     C->record_method_not_compilable("attempted to spill a non-spillable item");
     return nullptr;
   }
-  if (StressBailout && C->failing()) {
+  if (StressBailout && C->fail_randomly(1000)) {
     return nullptr; // ireg == 0 || ireg == Op_RegFlags
   }
   if (C->check_node_count(NodeLimitFudgeFactor, out_of_nodes)) {
@@ -315,7 +315,7 @@ Node* clone_node(Node* def, Block *b, Compile* C) {
     return 0;
   }
 
-  if (StressBailout && C->failing()) {
+  if (StressBailout && C->fail_randomly(1000)) {
     return 0; // def->needs_anti_dependence_check()
   }
 
@@ -367,7 +367,7 @@ Node *PhaseChaitin::split_Rematerialize(Node *def, Block *b, uint insidx, uint &
           C->record_method_not_compilable("attempted to spill a non-spillable item with RegFlags input");
           return 0; // Bailed out
         }
-	if (StressBailout && C->failing()) {
+	if (StressBailout && C->fail_randomly(1000)) {
 	  return 0; // !in->rematerialize()
 	}
       }
