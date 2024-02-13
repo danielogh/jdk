@@ -4803,8 +4803,6 @@ void PhaseIdealLoop::build_and_optimize() {
     DEBUG_ONLY( if (VerifyLoopOptimizations) { verify(); } );
   }
 
-  if (C->failing()) {return; }
-
   if (!C->major_progress() && do_expensive_nodes && process_expensive_nodes()) {
     C->set_major_progress();
   }
