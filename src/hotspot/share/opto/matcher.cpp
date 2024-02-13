@@ -197,6 +197,7 @@ void Matcher::match( ) {
   }
   // One-time initialization of some register masks.
   init_spill_mask( C->root()->in(1) );
+  if (C->failing()) {return; }
   _return_addr_mask = return_addr();
 #ifdef _LP64
   // Pointers take 2 slots in 64-bit land
@@ -1019,21 +1020,36 @@ void Matcher::init_spill_mask( Node *ret ) {
   // Share frame pointer while making spill ops
   set_shared(fp);
 
+  // TODO if we can argue that these failures are benign,
+  // it's possible that we would not need a dozen failing() checks here.
+
 // Get the ADLC notion of the right regmask, for each basic type.
 #ifdef _LP64
   idealreg2regmask[Op_RegN] = regmask_for_ideal_register(Op_RegN, ret);
+  if (C->failing()) return;
 #endif
   idealreg2regmask[Op_RegI] = regmask_for_ideal_register(Op_RegI, ret);
+  if (C->failing()) return;
   idealreg2regmask[Op_RegP] = regmask_for_ideal_register(Op_RegP, ret);
+  if (C->failing()) return;
   idealreg2regmask[Op_RegF] = regmask_for_ideal_register(Op_RegF, ret);
+  if (C->failing()) return;
   idealreg2regmask[Op_RegD] = regmask_for_ideal_register(Op_RegD, ret);
+  if (C->failing()) return;
   idealreg2regmask[Op_RegL] = regmask_for_ideal_register(Op_RegL, ret);
+  if (C->failing()) return;
   idealreg2regmask[Op_VecA] = regmask_for_ideal_register(Op_VecA, ret);
+  if (C->failing()) return;
   idealreg2regmask[Op_VecS] = regmask_for_ideal_register(Op_VecS, ret);
+  if (C->failing()) return;
   idealreg2regmask[Op_VecD] = regmask_for_ideal_register(Op_VecD, ret);
+  if (C->failing()) return;
   idealreg2regmask[Op_VecX] = regmask_for_ideal_register(Op_VecX, ret);
+  if (C->failing()) return;
   idealreg2regmask[Op_VecY] = regmask_for_ideal_register(Op_VecY, ret);
+  if (C->failing()) return;
   idealreg2regmask[Op_VecZ] = regmask_for_ideal_register(Op_VecZ, ret);
+  if (C->failing()) return;
   idealreg2regmask[Op_RegVectMask] = regmask_for_ideal_register(Op_RegVectMask, ret);
 }
 
@@ -2692,6 +2708,7 @@ const RegMask* Matcher::regmask_for_ideal_register(uint ideal_reg, Node* ret) {
   }
   MachNode* mspill = match_tree(spill);
   assert(mspill != nullptr, "matching failed: %d", ideal_reg);
+  if (C->failing()) {return nullptr; } //match_tree
   // Handle generic vector operand case
   if (Matcher::supports_generic_vector_operands && t->isa_vect()) {
     specialize_mach_node(mspill);

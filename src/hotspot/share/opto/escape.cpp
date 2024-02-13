@@ -803,6 +803,7 @@ void ConnectionGraph::verify_ram_nodes(Compile* C, Node* root) {
           if (sfpt->in(merge_idx) != nullptr && sfpt->in(merge_idx)->is_SafePointScalarMerge()) {
             assert(false, "SafePointScalarMerge nodes can't be nested.");
             C->record_failure(C2Compiler::retry_no_reduce_allocation_merges());
+	    // TODO check if there is there a point to continue if we saw a failure?
           }
         } else {
           assert(false, "Only safepoints can use SafePointScalarMerge nodes.");
@@ -811,7 +812,7 @@ void ConnectionGraph::verify_ram_nodes(Compile* C, Node* root) {
       }
     }
 
-    if (StressBailout && C->fail_randomly(1000)) {; } // Do nothing.
+    if (StressBailout && !C->failing(true) && C->fail_randomly(1000)) {; } // Do nothing.
 
     for (DUIterator_Fast imax, i = n->fast_outs(imax); i < imax; i++) {
       Node* m = n->fast_out(i);
@@ -3224,7 +3225,7 @@ PhiNode *ConnectionGraph::create_split_phi(PhiNode *orig_phi, int alias_idx, Gro
     }
   }
   if (C->live_nodes() + 2*NodeLimitFudgeFactor > C->max_node_limit()) {
-    if (C->do_escape_analysis() == true && !C->failing()) {
+    if (C->do_escape_analysis() == true && !C->failing(true)) {
       // Retry compilation without escape analysis.
       // If this is the first failure, the sentinel string will "stick"
       // to the Compile object, and the C2Compiler will see it and retry.
