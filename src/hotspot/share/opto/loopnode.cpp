@@ -6380,7 +6380,7 @@ void PhaseIdealLoop::build_loop_late_post_work(Node *n, bool pinned) {
       C->record_method_not_compilable("Bad graph detected in build_loop_late");
       return;
     }
-    if (StressBailout && C->fail_randomly(1000)) {
+    if (StressBailout && C->fail_randomly(100000)) { //kind of common.
       return;
     }
     // Find least loop nesting depth

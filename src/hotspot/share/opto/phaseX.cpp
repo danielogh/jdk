@@ -1039,7 +1039,7 @@ void PhaseIterGVN::optimize() {
       C->print_method(PHASE_AFTER_ITER_GVN, 3);
       return;
     }
-    if (StressBailout && C->fail_randomly(1000)) {
+    if (StressBailout && C->fail_randomly(1000000)) { //triggers often. 10**4 -> 10*77
       return;
     }
     DEBUG_ONLY(trace_PhaseIterGVN_verbose(n, num_processed++);)

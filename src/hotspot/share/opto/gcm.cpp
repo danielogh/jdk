@@ -1213,7 +1213,7 @@ Block* PhaseCFG::hoist_to_cheaper_block(Block* LCA, Block* early, Node* self) {
       return least;
     }
 
-    if (StressBailout && C->fail_randomly(1000)) {
+    if (StressBailout && C->fail_randomly(100000)) { //kind of common
       return least;
     }
 
@@ -1430,7 +1430,7 @@ void PhaseCFG::schedule_late(VectorSet &visited, Node_Stack &stack) {
       return;
     }
 
-    if (!C->failing(true) && StressBailout && C->fail_randomly(1000)) {
+    if (!C->failing(true) && StressBailout && C->fail_randomly(100000)) { //kind of comon -> 10**6
       return; // early > LCA
     }
 

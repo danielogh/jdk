@@ -1676,7 +1676,7 @@ Node* Matcher::Label_Root(const Node* n, State* svec, Node* control, Node*& mem)
     C->record_method_not_compilable("Out of stack space, increase MaxLabelRootDepth");
     return nullptr;
   }
-  if (StressBailout && C->fail_randomly(1000)) {
+  if (StressBailout && C->fail_randomly(100000)) { //kind of common
     return nullptr;
   } 
 
