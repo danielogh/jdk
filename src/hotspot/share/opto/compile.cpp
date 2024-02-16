@@ -2962,6 +2962,10 @@ void Compile::Code_Gen() {
 
   // Build a proper-looking CFG
   PhaseCFG cfg(node_arena(), root(), matcher);
+  if (failing()) {
+    return;
+  }
+
   _cfg = &cfg;
   {
     TracePhase tp("scheduler", &timers[_t_scheduler]);
