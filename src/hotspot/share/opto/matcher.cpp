@@ -291,14 +291,18 @@ void Matcher::match( ) {
 
     OptoReg::Name reg1 = warp_incoming_stk_arg(vm_parm_regs[i].first());
 
-    if (C->failing()) {return; } //warp_incoming_stk_arg
+    if (C->failing()) {
+      return;
+    } //warp_incoming_stk_arg
 
     if( OptoReg::is_valid(reg1))
       _calling_convention_mask[i].Insert(reg1);
 
     OptoReg::Name reg2 = warp_incoming_stk_arg(vm_parm_regs[i].second());
 
-    if (C->failing()) {return; }
+    if (C->failing()) {
+      return;
+    }
 
     if( OptoReg::is_valid(reg2))
       _calling_convention_mask[i].Insert(reg2);

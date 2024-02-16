@@ -754,7 +754,10 @@ Compile::Compile( ciEnv* ci_env, ciMethod* target, int osr_bci,
       StartNode* s = new StartOSRNode(root(), domain);
       initial_gvn()->set_type_bottom(s);
       init_start(s);
-      if (C->failing()) {return; } //init_start
+      if (C->failing()) {
+        return;
+      } //init_start
+
       cg = CallGenerator::for_osr(method(), entry_bci());
     } else {
       // Normal case.
@@ -762,7 +765,10 @@ Compile::Compile( ciEnv* ci_env, ciMethod* target, int osr_bci,
       StartNode* s = new StartNode(root(), tf()->domain());
       initial_gvn()->set_type_bottom(s);
       init_start(s);
-      if (C->failing()) {return; } //init_start
+      if (C->failing()) {
+        return;
+      } //init_start
+
       if (method()->intrinsic_id() == vmIntrinsics::_Reference_get) {
         // With java.lang.ref.reference.get() we must go through the
         // intrinsic - even when get() is the root

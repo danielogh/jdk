@@ -1458,7 +1458,9 @@ void PhaseCFG::schedule_late(VectorSet &visited, Node_Stack &stack) {
       // Just use the LCA of the uses.
       late = LCA;
     }
-    if (C->failing()) {return; }  //hoist_to_cheaper_block
+    if (C->failing()) {
+      return;
+    }  //hoist_to_cheaper_block
 
     // Put the node into target block
     schedule_node_into_block(self, late);

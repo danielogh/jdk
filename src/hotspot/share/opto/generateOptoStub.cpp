@@ -264,7 +264,9 @@ void GraphKit::gen_stub(address C_function,
                                   exc_target, null());
   root()->add_req(_gvn.transform(to_exc));  // bind to root to keep live
   C->init_start(start);
-  if (C->failing()) {return; }
+  if (C->failing()) {
+    return;
+  }
 
   //-----------------------------
   // If this is a normal subroutine return, issue the return and be done.
