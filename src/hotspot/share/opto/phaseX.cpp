@@ -1039,9 +1039,6 @@ void PhaseIterGVN::optimize() {
       C->print_method(PHASE_AFTER_ITER_GVN, 3);
       return;
     }
-    if (StressBailout && C->fail_randomly(1000)) {
-      return;
-    }
     DEBUG_ONLY(trace_PhaseIterGVN_verbose(n, num_processed++);)
     if (n->outcnt() != 0) {
       NOT_PRODUCT(const Type* oldtype = type_or_null(n));

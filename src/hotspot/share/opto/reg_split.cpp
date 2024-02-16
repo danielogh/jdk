@@ -68,9 +68,6 @@ Node *PhaseChaitin::get_spillcopy_wide(MachSpillCopyNode::SpillType spill_type, 
     C->record_method_not_compilable("attempted to spill a non-spillable item");
     return nullptr;
   }
-  if (StressBailout && C->fail_randomly(1000)) {
-    return nullptr; // ireg == 0 || ireg == Op_RegFlags
-  }
   if (C->check_node_count(NodeLimitFudgeFactor, out_of_nodes)) {
     return nullptr;
   }
@@ -310,15 +307,10 @@ Node* clone_node(Node* def, Block *b, Compile* C) {
     } else {
       // Bailout without retry
       assert(false, "RA Split failed: attempt to clone node with anti_dependence");
-      C->record_method_not_compilable("RA Split failed: attempt to clone node with anti_dependence", true);
+      C->record_method_not_compilable("RA Split failed: attempt to clone node with anti_dependence");
     }
     return 0;
   }
-
-  if (StressBailout && C->fail_randomly(1000)) {
-    return 0; // def->needs_anti_dependence_check()
-  }
-
   return def->clone();
 }
 
@@ -367,9 +359,6 @@ Node *PhaseChaitin::split_Rematerialize(Node *def, Block *b, uint insidx, uint &
           C->record_method_not_compilable("attempted to spill a non-spillable item with RegFlags input");
           return 0; // Bailed out
         }
-	if (StressBailout && C->fail_randomly(1000)) {
-	  return 0; // !in->rematerialize()
-	}
       }
     }
   }

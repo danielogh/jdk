@@ -147,9 +147,6 @@ OptoReg::Name Matcher::warp_incoming_stk_arg( VMReg reg ) {
       C->record_method_not_compilable("unsupported incoming calling sequence");
       return OptoReg::Bad;
     }
-    if (StressBailout && C->fail_randomly(1000)) {
-      return OptoReg::Bad;
-    }
     return warped;
   }
   return OptoReg::as_OptoReg(reg);
@@ -414,7 +411,7 @@ void Matcher::match( ) {
       assert(C->failure_reason() != nullptr, "graph lost: reason unknown");
       ss.print("graph lost: reason unknown");
     }
-    C->record_method_not_compilable(ss.as_string(), true);
+    C->record_method_not_compilable(ss.as_string());
   }
   if (C->failing()) {
     // delete old;
@@ -1020,9 +1017,6 @@ void Matcher::init_spill_mask( Node *ret ) {
   // Share frame pointer while making spill ops
   set_shared(fp);
 
-  // TODO if we can argue that these failures are benign,
-  // it's possible that we would not need a dozen failing() checks here.
-
 // Get the ADLC notion of the right regmask, for each basic type.
 #ifdef _LP64
   idealreg2regmask[Op_RegN] = regmask_for_ideal_register(Op_RegN, ret);
@@ -1284,9 +1278,6 @@ OptoReg::Name Matcher::warp_outgoing_stk_arg( VMReg reg, OptoReg::Name begin_out
     if (!RegMask::can_represent_arg(warped)) {
       // Bailout. For example not enough space on stack for all arguments. Happens for methods with too many arguments.
       C->record_method_not_compilable("unsupported calling sequence");
-      return OptoReg::Bad;
-    }
-    if (StressBailout && C->fail_randomly(1000)) {
       return OptoReg::Bad;
     }
     return warped;
@@ -1676,10 +1667,6 @@ Node* Matcher::Label_Root(const Node* n, State* svec, Node* control, Node*& mem)
     C->record_method_not_compilable("Out of stack space, increase MaxLabelRootDepth");
     return nullptr;
   }
-  if (StressBailout && C->fail_randomly(1000)) {
-    return nullptr;
-  } 
-
   uint care = 0;                // Edges matcher cares about
   uint cnt = n->req();
   uint i = 0;

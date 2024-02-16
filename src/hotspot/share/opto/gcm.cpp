@@ -1213,10 +1213,6 @@ Block* PhaseCFG::hoist_to_cheaper_block(Block* LCA, Block* early, Node* self) {
       return least;
     }
 
-    if (StressBailout && C->fail_randomly(1000)) {
-      return least;
-    }
-
     // Don't hoist machine instructions to the root basic block
     if (mach && LCA == root_block)
       break;
@@ -1425,13 +1421,9 @@ void PhaseCFG::schedule_late(VectorSet &visited, Node_Stack &stack) {
       } else {
         // Bailout without retry when (early->_dom_depth > LCA->_dom_depth)
         assert(false, "graph should be schedulable");
-        C->record_method_not_compilable("late schedule failed: incorrect graph", true);
+        C->record_method_not_compilable("late schedule failed: incorrect graph");
       }
       return;
-    }
-
-    if (!C->failing(true) && StressBailout && C->fail_randomly(1000)) {
-      return; // early > LCA
     }
 
     if (self->is_memory_writer()) {
@@ -1511,9 +1503,6 @@ void PhaseCFG::global_code_motion() {
     // Bailout without retry
     assert(false, "early schedule failed");
     C->record_method_not_compilable("early schedule failed");
-    return;
-  }
-  if (StressBailout && C->fail_randomly(1000)) {
     return;
   }
 
@@ -1614,12 +1603,8 @@ void PhaseCFG::global_code_motion() {
     if (!schedule_local(block, ready_cnt, visited, recalc_pressure_nodes)) {
       if (!C->failure_reason_is(C2Compiler::retry_no_subsuming_loads())) {
         assert(false, "local schedule failed");
-        C->record_method_not_compilable("local schedule failed", true);
+        C->record_method_not_compilable("local schedule failed");
       }
-      _regalloc = nullptr;
-      return;
-    }
-    if (StressBailout && C->fail_randomly(1000)) {
       _regalloc = nullptr;
       return;
     }

@@ -786,7 +786,6 @@ Compile::Compile( ciEnv* ci_env, ciMethod* target, int osr_bci,
       record_method_not_compilable(ss.as_string());
       return;
     }
-    // Just did a failing check, nothing to stress.
 
     gvn.set_type(root(), root()->bottom_type());
 
@@ -795,11 +794,9 @@ Compile::Compile( ciEnv* ci_env, ciMethod* target, int osr_bci,
       assert(failure_reason() != nullptr, "expect reason for parse failure");
       stringStream ss;
       ss.print("method parse failed: %s", failure_reason());
-      record_method_not_compilable(ss.as_string(), true);
+      record_method_not_compilable(ss.as_string());
       return;
     }
-    // This part of code might have cascading effects when bailout-stressed.
-    // Leaving it for now.
     GraphKit kit(jvms);
 
     if (!kit.stopped()) {
@@ -1131,7 +1128,7 @@ void Compile::Init(bool aliasing) {
 //---------------------------init_start----------------------------------------
 // Install the StartNode on this compile object.
 void Compile::init_start(StartNode* s) {
-  if (failing_internal()) // Might be cascading, not using stress option here.
+  if (failing())
     return; // already failing
   assert(s == start(), "");
 }
@@ -1142,7 +1139,7 @@ void Compile::init_start(StartNode* s) {
  * the ideal graph.
  */
 StartNode* Compile::start() const {
-  assert (!failing_internal(), "Must not have pending failure. Reason is: %s", failure_reason());
+  assert (!failing(), "Must not have pending failure. Reason is: %s", failure_reason());
   for (DUIterator_Fast imax, i = root()->fast_outs(imax); i < imax; i++) {
     Node* start = root()->fast_out(i);
     if (start->is_Start()) {
@@ -2965,7 +2962,6 @@ void Compile::Code_Gen() {
 
   // Build a proper-looking CFG
   PhaseCFG cfg(node_arena(), root(), matcher);
-  if (failing()) {return; }
   _cfg = &cfg;
   {
     TracePhase tp("scheduler", &timers[_t_scheduler]);
@@ -4016,9 +4012,6 @@ bool Compile::final_graph_reshaping() {
     record_method_not_compilable("trivial infinite loop");
     return true;
   }
-  if (StressBailout && C->fail_randomly(1000)) {
-    return true;
-  }
 
   // Expensive nodes have their control input set to prevent the GVN
   // from freely commoning them. There's no GVN beyond this point so
@@ -4087,9 +4080,6 @@ bool Compile::final_graph_reshaping() {
         record_method_not_compilable("malformed control flow");
         return true;            // Not all targets reachable!
       }
-      if (StressBailout && C->fail_randomly(1000)) {
-	return true;
-      }
     } else if (n->is_PCTable() && n->in(0) && n->in(0)->in(0) && n->in(0)->in(0)->is_Call()) {
       CallNode* call = n->in(0)->in(0)->as_Call();
       if (call->entry_point() == OptoRuntime::new_array_Java() ||
@@ -4103,15 +4093,12 @@ bool Compile::final_graph_reshaping() {
     }
     // Check that I actually visited all kids.  Unreached kids
     // must be infinite loops.
-    for (DUIterator_Fast jmax, j = n->fast_outs(jmax); j < jmax; j++) {
+    for (DUIterator_Fast jmax, j = n->fast_outs(jmax); j < jmax; j++)
       if (!frc._visited.test(n->fast_out(j)->_idx)) {
         record_method_not_compilable("infinite loop");
         return true;            // Found unvisited kid; must be unreach
       }
-      if (StressBailout && C->fail_randomly(1000)) {
-	return true;
-      }
-    }
+
     // Here so verification code in final_graph_reshaping_walk()
     // always see an OuterStripMinedLoopEnd
     if (n->is_OuterStripMinedLoopEnd() || n->is_LongCountedLoopEnd()) {
@@ -4400,7 +4387,7 @@ void Compile::verify_graph_edges(bool no_dead_code) {
 // to backtrack and retry without subsuming loads.  Other than this backtracking
 // behavior, the Compile's failure reason is quietly copied up to the ciEnv
 // by the logic in C2Compiler.
-void Compile::record_failure(const char* reason, bool skip) {
+void Compile::record_failure(const char* reason) {
   if (log() != nullptr) {
     log()->elem("failure reason='%s' phase='compile'", reason);
   }
@@ -4409,10 +4396,6 @@ void Compile::record_failure(const char* reason, bool skip) {
     _failure_reason = reason;
     if (CaptureBailoutInformation) {
       _first_failure_details = new CompilationFailureInfo(reason);
-    }
-  } else {
-    if (StressBailout && !skip)  {
-        guarantee(false, "should have handled previous failure.");
     }
   }
 
@@ -4441,7 +4424,7 @@ Compile::TracePhase::TracePhase(const char* name, elapsedTimer* accumulator)
 }
 
 Compile::TracePhase::~TracePhase() {
-  if (_compile->failing(true)) return; // print-only code, not stressing bailouts.
+  if (_compile->failing()) return;
 #ifdef ASSERT
   if (PrintIdealNodeCount) {
     tty->print_cr("phase name='%s' nodes='%d' live='%d' live_graph_walk='%d'",
@@ -5158,7 +5141,7 @@ void Compile::sort_macro_nodes() {
 }
 
 void Compile::print_method(CompilerPhaseType cpt, int level, Node* n) {
-  if (failing_internal()) { return; } // failing_internal to not stress bailouts from printing code.
+  if (failing()) { return; }
   EventCompilerPhase event;
   if (event.should_commit()) {
     CompilerEvent::PhaseEvent::post(event, C->_latest_stage_start_counter, cpt, C->_compile_id, level);

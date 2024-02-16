@@ -1202,10 +1202,6 @@ bool PhaseCFG::schedule_local(Block* block, GrowableArray<int>& ready_cnt, Vecto
     return false;
   }
 
-  if (StressBailout && C->fail_randomly(1000)) {
-    return false; // case phi_cnt != block->end_idx() 
-  }
-
   if (OptoRegScheduling && block_size_threshold_ok) {
     _regalloc->compute_exit_block_pressure(block);
     block->_reg_pressure = _regalloc->_sched_int_pressure.final_pressure();

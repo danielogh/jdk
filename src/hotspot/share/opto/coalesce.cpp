@@ -304,11 +304,6 @@ void PhaseAggressiveCoalesce::insert_copies( Matcher &matcher ) {
                 }
                 return;
               }
-
-	      if (StressBailout && C->fail_randomly(1000)) {
-	        return;
-              }
-
               const RegMask *rm = C->matcher()->idealreg2spillmask[ireg];
               copy = new MachSpillCopyNode(MachSpillCopyNode::PhiInput, m, *rm, *rm);
               // Find a good place to insert.  Kinda tricky, use a subroutine
@@ -349,9 +344,6 @@ void PhaseAggressiveCoalesce::insert_copies( Matcher &matcher ) {
                        m->_idx, m->Name(), ireg, MachSpillCopyNode::spill_type(MachSpillCopyNode::TwoAddress));
                 C->record_method_not_compilable("attempted to spill a non-spillable item");
                 return;
-              }
-	      if (StressBailout && C->fail_randomly(1000)) {
-	        return;
               }
               const RegMask *rm = C->matcher()->idealreg2spillmask[ireg];
               copy = new MachSpillCopyNode(MachSpillCopyNode::TwoAddress, m, *rm, *rm);
@@ -406,9 +398,6 @@ void PhaseAggressiveCoalesce::insert_copies( Matcher &matcher ) {
                        inp->_idx, inp->Name(), ireg, MachSpillCopyNode::spill_type(MachSpillCopyNode::DebugUse));
                 C->record_method_not_compilable("attempted to spill a non-spillable item");
                 return;
-              }
-	      if (StressBailout && C->fail_randomly(1000)) {
-	        return;
               }
               const RegMask *rm = C->matcher()->idealreg2spillmask[ireg];
               Node* copy = new MachSpillCopyNode(MachSpillCopyNode::DebugUse, inp, *rm, *rm);

@@ -426,7 +426,7 @@ class Parse : public GraphKit {
   void set_parse_bci(int bci);
 
   // Must this parse be aborted?
-  bool failing()                { return C->failing(true); } //skip=true to avoid cascading effects
+  bool failing()                { return C->failing(); }
 
   Block* rpo_at(int rpo) {
     assert(0 <= rpo && rpo < _block_count, "oob");

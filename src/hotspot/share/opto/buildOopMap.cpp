@@ -255,12 +255,8 @@ OopMap *OopFlow::build_oop_map( Node *n, int max_reg, PhaseRegAlloc *regalloc, i
         ss.print("illegal oopMap register name: ");
         r->print_on(&ss);
         assert(false, "%s", ss.as_string());
-        regalloc->C->record_method_not_compilable(ss.as_string(), true);
+        regalloc->C->record_method_not_compilable(ss.as_string());
         continue;
-      }
-      if (!C->failing(true) && StressBailout && C->fail_randomly(1000)) {
-	 // Can we convert the continue to a return, here and above?
-	 continue;
       }
       if( t->is_ptr()->_offset == 0 ) { // Not derived?
         if( mcall ) {
@@ -332,9 +328,6 @@ OopMap *OopFlow::build_oop_map( Node *n, int max_reg, PhaseRegAlloc *regalloc, i
         assert(false, "%s", ss.as_string());
         regalloc->C->record_method_not_compilable(ss.as_string());
         continue;
-      }
-      if (!C->failing(true) && StressBailout && C->fail_randomly(1000)) {
-	continue; // Can we use a return here and above?
       }
       if( mcall ) {
           // Outgoing argument GC mask responsibility belongs to the callee,
