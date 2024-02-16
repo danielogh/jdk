@@ -194,7 +194,9 @@ void Matcher::match( ) {
   }
   // One-time initialization of some register masks.
   init_spill_mask( C->root()->in(1) );
-  if (C->failing()) {return; }
+  if (C->failing()) {
+    return;
+  }
   _return_addr_mask = return_addr();
 #ifdef _LP64
   // Pointers take 2 slots in 64-bit land
@@ -1445,17 +1447,23 @@ MachNode *Matcher::match_sfpt( SafePointNode *sfpt ) {
       }
       // Grab first register, adjust stack slots and insert in mask.
       OptoReg::Name reg1 = warp_outgoing_stk_arg(first, begin_out_arg_area, out_arg_limit_per_call );
+
+      if (C->failing()) {
+        return nullptr;
+      } //warp_outgoing_stk_arg
+
       if (OptoReg::is_valid(reg1))
         rm->Insert( reg1 );
 
-      if (C->failing()) {return nullptr; } //warp_outgoing_stk_arg
-
       // Grab second register (if any), adjust stack slots and insert in mask.
       OptoReg::Name reg2 = warp_outgoing_stk_arg(second, begin_out_arg_area, out_arg_limit_per_call );
+
+      if (C->failing()) {
+	return nullptr;
+      } //warp_outgoing_stk_arg
+
       if (OptoReg::is_valid(reg2))
         rm->Insert( reg2 );
-
-      if (C->failing()) {return nullptr; } //warp_outgoing_stk_arg
 
     } // End of for all arguments
   }
@@ -2695,7 +2703,10 @@ const RegMask* Matcher::regmask_for_ideal_register(uint ideal_reg, Node* ret) {
   }
   MachNode* mspill = match_tree(spill);
   assert(mspill != nullptr, "matching failed: %d", ideal_reg);
-  if (C->failing()) {return nullptr; } //match_tree
+  if (C->failing()) {
+    return nullptr;
+  } //match_tree
+
   // Handle generic vector operand case
   if (Matcher::supports_generic_vector_operands && t->isa_vect()) {
     specialize_mach_node(mspill);
