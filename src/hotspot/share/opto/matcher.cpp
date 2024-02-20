@@ -1020,36 +1020,21 @@ void Matcher::init_spill_mask( Node *ret ) {
   // Share frame pointer while making spill ops
   set_shared(fp);
 
-  // TODO if we can argue that these failures are benign,
-  // it's possible that we would not need a dozen failing() checks here.
-
 // Get the ADLC notion of the right regmask, for each basic type.
 #ifdef _LP64
   idealreg2regmask[Op_RegN] = regmask_for_ideal_register(Op_RegN, ret);
-  if (C->failing()) return;
 #endif
   idealreg2regmask[Op_RegI] = regmask_for_ideal_register(Op_RegI, ret);
-  if (C->failing()) return;
   idealreg2regmask[Op_RegP] = regmask_for_ideal_register(Op_RegP, ret);
-  if (C->failing()) return;
   idealreg2regmask[Op_RegF] = regmask_for_ideal_register(Op_RegF, ret);
-  if (C->failing()) return;
   idealreg2regmask[Op_RegD] = regmask_for_ideal_register(Op_RegD, ret);
-  if (C->failing()) return;
   idealreg2regmask[Op_RegL] = regmask_for_ideal_register(Op_RegL, ret);
-  if (C->failing()) return;
   idealreg2regmask[Op_VecA] = regmask_for_ideal_register(Op_VecA, ret);
-  if (C->failing()) return;
   idealreg2regmask[Op_VecS] = regmask_for_ideal_register(Op_VecS, ret);
-  if (C->failing()) return;
   idealreg2regmask[Op_VecD] = regmask_for_ideal_register(Op_VecD, ret);
-  if (C->failing()) return;
   idealreg2regmask[Op_VecX] = regmask_for_ideal_register(Op_VecX, ret);
-  if (C->failing()) return;
   idealreg2regmask[Op_VecY] = regmask_for_ideal_register(Op_VecY, ret);
-  if (C->failing()) return;
   idealreg2regmask[Op_VecZ] = regmask_for_ideal_register(Op_VecZ, ret);
-  if (C->failing()) return;
   idealreg2regmask[Op_RegVectMask] = regmask_for_ideal_register(Op_RegVectMask, ret);
 }
 
@@ -2677,6 +2662,10 @@ bool Matcher::gen_narrow_oop_implicit_null_checks() {
 
 // Compute RegMask for an ideal register.
 const RegMask* Matcher::regmask_for_ideal_register(uint ideal_reg, Node* ret) {
+  assert(!C->failing(), "already failing.");
+  if (C->failing()) {
+    return nullptr;
+  }
   const Type* t = Type::mreg2type[ideal_reg];
   if (t == nullptr) {
     assert(ideal_reg >= Op_VecA && ideal_reg <= Op_VecZ, "not a vector: %d", ideal_reg);
