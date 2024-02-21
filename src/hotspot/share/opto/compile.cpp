@@ -4411,8 +4411,9 @@ void Compile::record_failure(const char* reason, bool skip) {
       _first_failure_details = new CompilationFailureInfo(reason);
     }
   } else {
-    if (StressBailout && !skip)  {
-	tty->print_cr("previous failure was: %s", _failure_reason); //TODO  remove.
+    if (StressBailout && !skip) {
+	tty->print_cr("previous failure was: %s", _failure_reason); //TODO remove later.
+	tty->print_cr("current failure is: %s", reason);
         guarantee(false, "should have handled previous failure.");
     }
   }

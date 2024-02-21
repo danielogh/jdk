@@ -822,16 +822,13 @@ private:
     if (failing_internal()) {
       return true;
     }
-    DEBUG_ONLY(return false;) // TODO debug builds assert on bailouts. Do we want this silent skip?
     if (!StressBailout || skip) {return false; }
     return fail_randomly(StressBailoutInterval);
   }
 
   bool fail_randomly(uint invprob) {
-    if (invprob < 1) {
-      invprob = 1;
-      guarantee(false, "argument error");
-    }
+    guarantee(0 < invprob, "argument error");
+    DEBUG_ONLY(return false;) // TODO debug builds assert on bailouts. Do we want this silent skip?
     int r = os::random();
     if (r % invprob) {return false; }
     record_failure("StressBailout");
