@@ -777,16 +777,14 @@ Compile::Compile( ciEnv* ci_env, ciMethod* target, int osr_bci,
         cg = CallGenerator::for_inline(method(), expected_uses);
       }
     }
-    if (failing())  return;
     if (cg == nullptr) {
       const char* reason = InlineTree::check_can_parse(method());
       assert(reason != nullptr, "expect reason for parse failure");
       stringStream ss;
       ss.print("cannot parse method: %s", reason);
-      record_method_not_compilable(ss.as_string());
+      record_method_not_compilable(ss.as_string(), true);
       return;
     }
-    // Just did a failing check, nothing to stress.
 
     gvn.set_type(root(), root()->bottom_type());
 
