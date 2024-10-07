@@ -340,7 +340,9 @@ static inline void add_one_req(Node* dstphi, Node* src) {
 // having a control input of its exception map, rather than null.  Such
 // regions do not appear except in this function, and in use_exception_state.
 void GraphKit::combine_exception_states(SafePointNode* ex_map, SafePointNode* phi_map) {
-  if (failing())  return;  // dying anyway...
+  if (failing_internal()) {
+    return;  // dying anyway...
+  }
   JVMState* ex_jvms = ex_map->_jvms;
   assert(ex_jvms->same_calls_as(phi_map->_jvms), "consistent call chains");
   assert(ex_jvms->stkoff() == phi_map->_jvms->stkoff(), "matching locals");
@@ -446,7 +448,7 @@ void GraphKit::combine_exception_states(SafePointNode* ex_map, SafePointNode* ph
 
 //--------------------------use_exception_state--------------------------------
 Node* GraphKit::use_exception_state(SafePointNode* phi_map) {
-  if (failing()) { stop(); return top(); }
+  if (failing_internal()) { stop(); return top(); }
   Node* region = phi_map->control();
   Node* hidden_merge_mark = root();
   assert(phi_map->jvms()->map() == phi_map, "sanity: 1-1 relation");
@@ -1209,7 +1211,7 @@ Node* GraphKit::load_array_length(Node* array) {
   Node *alen;
   if (alloc == nullptr) {
     Node *r_adr = basic_plus_adr(array, arrayOopDesc::length_offset_in_bytes());
-    alen = _gvn.transform( new LoadRangeNode(0, immutable_memory(), r_adr, TypeInt::POS));
+    alen = _gvn.transform( new LoadRangeNode(nullptr, immutable_memory(), r_adr, TypeInt::POS));
   } else {
     alen = array_ideal_length(alloc, _gvn.type(array)->is_oopptr(), false);
   }
@@ -2056,7 +2058,9 @@ Node* GraphKit::uncommon_trap(int trap_request,
                              ciKlass* klass, const char* comment,
                              bool must_throw,
                              bool keep_exact_action) {
-  if (failing())  stop();
+  if (failing_internal()) {
+    stop();
+  }
   if (stopped())  return nullptr; // trap reachable?
 
   // Note:  If ProfileTraps is true, and if a deopt. actually
@@ -2151,7 +2155,7 @@ Node* GraphKit::uncommon_trap(int trap_request,
   kill_dead_locals();
 
   // Now insert the uncommon trap subroutine call
-  address call_addr = SharedRuntime::uncommon_trap_blob()->entry_point();
+  address call_addr = OptoRuntime::uncommon_trap_blob()->entry_point();
   const TypePtr* no_memory_effects = nullptr;
   // Pass the index of the class to be loaded
   Node* call = make_runtime_call(RC_NO_LEAF | RC_UNCOMMON |
@@ -2385,7 +2389,7 @@ Node* GraphKit::precision_rounding(Node* n) {
   if (Matcher::strict_fp_requires_explicit_rounding) {
 #ifdef IA32
     if (UseSSE == 0) {
-      return _gvn.transform(new RoundFloatNode(0, n));
+      return _gvn.transform(new RoundFloatNode(nullptr, n));
     }
 #else
     Unimplemented();
@@ -2399,7 +2403,7 @@ Node* GraphKit::dprecision_rounding(Node *n) {
   if (Matcher::strict_fp_requires_explicit_rounding) {
 #ifdef IA32
     if (UseSSE < 2) {
-      return _gvn.transform(new RoundDoubleNode(0, n));
+      return _gvn.transform(new RoundDoubleNode(nullptr, n));
     }
 #else
     Unimplemented();
@@ -3489,10 +3493,7 @@ FastLockNode* GraphKit::shared_lock(Node* obj) {
   box = _gvn.transform(box);
   Node* mem = reset_memory();
 
-  FastLockNode * flock = _gvn.transform(new FastLockNode(0, obj, box) )->as_FastLock();
-
-  // Create the rtm counters for this fast lock if needed.
-  flock->create_rtm_lock_counter(sync_jvms()); // sync_jvms used to get current bci
+  FastLockNode * flock = _gvn.transform(new FastLockNode(nullptr, obj, box) )->as_FastLock();
 
   // Add monitor to debug info for the slow path.  If we block inside the
   // slow path and de-opt, we need the monitor hanging around
