@@ -1988,9 +1988,9 @@ void PhaseIdealLoop::split_if_with_blocks(VectorSet &visited, Node_Stack &nstack
       if (cnt != 0 && !n->is_Con()) {
         assert(has_node(n), "no dead nodes");
         split_if_with_blocks_post(n);
-      }
-      if (C->failing()) {
-        return;
+        if (C->failing()) {
+          return;
+        }
       }
       if (must_throttle_split_if()) {
         nstack.clear();

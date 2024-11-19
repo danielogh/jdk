@@ -163,8 +163,6 @@ Node *PhaseIdealLoop::get_early_ctrl_for_expensive(Node *n, Node* earliest) {
     DEBUG_ONLY(dump_bad_graph("Bad graph detected in get_early_ctrl_for_expensive", n, earliest, ctl);)
     assert(false, "Bad graph detected in get_early_ctrl_for_expensive");
     C->record_failure("Bad graph detected in get_early_ctrl_for_expensive");
-  }
-  if (C->failing()) {
     return nullptr;
   }
   if (dom_depth(ctl) < min_dom_depth) {
@@ -4896,7 +4894,6 @@ void PhaseIdealLoop::build_and_optimize() {
       }
     }
   }
-
 
   // Check for aggressive application of split-if and other transforms
   // that require basic-block info (like cloning through Phi's)
