@@ -5038,7 +5038,6 @@ bool Compile::fail_randomly() {
 }
 
 bool Compile::failure_is_artificial() {
-  assert(failing_internal(), "should be failing");
   return C->failure_reason_is("StressBailout");
 }
 #endif

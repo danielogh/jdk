@@ -1533,7 +1533,6 @@ void PhaseCFG::schedule_late(VectorSet &visited, Node_Stack &stack) {
       // defs in new LCA block.
       LCA = insert_anti_dependences(LCA, self);
     }
-
     if (C->failing()) {
       return;
     }
