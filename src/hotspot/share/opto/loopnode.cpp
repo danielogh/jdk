@@ -159,12 +159,14 @@ Node *PhaseIdealLoop::get_early_ctrl_for_expensive(Node *n, Node* earliest) {
   Node* ctl = n->in(0);
   assert(ctl->is_CFG(), "expensive input 0 must be cfg");
   uint min_dom_depth = dom_depth(earliest);
-#ifdef ASSERT
   if (!is_dominator(ctl, earliest) && !is_dominator(earliest, ctl)) {
-    dump_bad_graph("Bad graph detected in get_early_ctrl_for_expensive", n, earliest, ctl);
+    DEBUG_ONLY(dump_bad_graph("Bad graph detected in get_early_ctrl_for_expensive", n, earliest, ctl);)
     assert(false, "Bad graph detected in get_early_ctrl_for_expensive");
+    C->record_failure("Bad graph detected in get_early_ctrl_for_expensive");
   }
-#endif
+  if (C->failing()) {
+    return nullptr;
+  }
   if (dom_depth(ctl) < min_dom_depth) {
     return earliest;
   }
@@ -4895,11 +4897,15 @@ void PhaseIdealLoop::build_and_optimize() {
     }
   }
 
+
   // Check for aggressive application of split-if and other transforms
   // that require basic-block info (like cloning through Phi's)
   if (!C->major_progress() && SplitIfBlocks && do_split_ifs) {
     visited.clear();
     split_if_with_blocks( visited, nstack);
+    if (C->failing()) {
+      return;
+    }
     DEBUG_ONLY( if (VerifyLoopOptimizations) { verify(); } );
   }
 
@@ -6423,6 +6429,7 @@ void PhaseIdealLoop::build_loop_late_post_work(Node *n, bool pinned) {
 #ifdef ASSERT
   if (_verify_only && !n->is_CFG()) {
     // Check def-use domination.
+    // We would like to expose this check in product but it appears to be expensive.
     compute_lca_of_uses(n, get_ctrl(n), true /* verify */);
   }
 #endif
