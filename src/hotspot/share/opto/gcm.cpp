@@ -1532,9 +1532,9 @@ void PhaseCFG::schedule_late(VectorSet &visited, Node_Stack &stack) {
       // Hoist LCA above possible-defs and insert anti-dependences to
       // defs in new LCA block.
       LCA = insert_anti_dependences(LCA, self);
-    }
-    if (C->failing()) {
-      return;
+      if (C->failing()) {
+        return;
+      }
     }
 
     if (early->_dom_depth > LCA->_dom_depth) {
