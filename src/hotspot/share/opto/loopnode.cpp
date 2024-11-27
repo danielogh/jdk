@@ -159,12 +159,12 @@ Node *PhaseIdealLoop::get_early_ctrl_for_expensive(Node *n, Node* earliest) {
   Node* ctl = n->in(0);
   assert(ctl->is_CFG(), "expensive input 0 must be cfg");
   uint min_dom_depth = dom_depth(earliest);
+#ifdef ASSERT
   if (!is_dominator(ctl, earliest) && !is_dominator(earliest, ctl)) {
-    DEBUG_ONLY(dump_bad_graph("Bad graph detected in get_early_ctrl_for_expensive", n, earliest, ctl);)
+    dump_bad_graph("Bad graph detected in get_early_ctrl_for_expensive", n, earliest, ctl);
     assert(false, "Bad graph detected in get_early_ctrl_for_expensive");
-    C->record_failure("Bad graph detected in get_early_ctrl_for_expensive");
-    return nullptr;
   }
+#endif
   if (dom_depth(ctl) < min_dom_depth) {
     return earliest;
   }
@@ -4899,7 +4899,7 @@ void PhaseIdealLoop::build_and_optimize() {
   // that require basic-block info (like cloning through Phi's)
   if (!C->major_progress() && SplitIfBlocks && do_split_ifs) {
     visited.clear();
-    split_if_with_blocks( visited, nstack);
+    split_if_with_blocks(visited, nstack);
     if (C->failing()) {
       return;
     }
