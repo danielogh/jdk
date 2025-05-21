@@ -74,6 +74,7 @@ class StringConcat : public ResourceObj {
 
   bool validate_mem_flow();
   bool validate_control_flow();
+  bool resproj_has_cmpp_use();
 
   StringConcat* merge(StringConcat* other, Node* arg);
 
@@ -630,6 +631,26 @@ StringConcat* PhaseStringOpts::build_candidate(CallStaticJavaNode* call) {
 }
 
 
+bool StringConcat::resproj_has_cmpp_use() {
+
+  CallStaticJavaNode* csj = _end;
+
+  CallProjections projs;
+  csj->extract_projections(&projs, false);
+
+  if (projs.resproj != nullptr) {
+    for (SimpleDUIterator i(projs.resproj); i.has_next(); i.next()) {
+      Node* use = i.get();
+      int opc = use->Opcode();
+      if (opc == Op_CmpP) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+
 PhaseStringOpts::PhaseStringOpts(PhaseGVN* gvn):
   Phase(StringOpts),
   _gvn(gvn) {
@@ -671,9 +692,12 @@ PhaseStringOpts::PhaseStringOpts(PhaseGVN* gvn):
               tty->print_cr("considering stacked concats");
             }
 #endif
-
             StringConcat* merged = sc->merge(other, arg);
-            if (merged->validate_control_flow() && merged->validate_mem_flow()) {
+            if (merged->validate_control_flow() && merged->validate_mem_flow()
+                // Check for stacked concatenation for SB pairs where
+                // the result projection of the first SB is used e.g.
+                // as an argument to String.valueOf or unstable ifs in the second SB.
+                && !other->resproj_has_cmpp_use()) {
 #ifndef PRODUCT
               Atomic::inc(&_stropts_merged);
               if (PrintOptimizeStringConcat) {
