@@ -339,15 +339,6 @@ void StringConcat::eliminate_call(CallNode* call) {
     C->gvn_replace_by(projs.catchall_ioproj, C->top());
   }
   if (projs.catchall_catchproj != nullptr) {
-    // EA can't cope with the partially collapsed graph this
-    // creates so put it on the worklist to be collapsed later.
-    for (SimpleDUIterator i(projs.catchall_catchproj); i.has_next(); i.next()) {
-      Node *use = i.get();
-      int opc = use->Opcode();
-      if (opc == Op_CreateEx || opc == Op_Region) {
-        _stringopts->record_dead_node(use);
-      }
-    }
     C->gvn_replace_by(projs.catchall_catchproj, C->top());
   }
   if (projs.resproj != nullptr) {
@@ -714,60 +705,7 @@ PhaseStringOpts::PhaseStringOpts(PhaseGVN* gvn):
     replace_string_concat(sc);
   }
 
-  remove_dead_nodes();
 }
-
-void PhaseStringOpts::record_dead_node(Node* dead) {
-  dead_worklist.push(dead);
-}
-
-void PhaseStringOpts::remove_dead_nodes() {
-  // Delete any dead nodes to make things clean enough that escape
-  // analysis doesn't get unhappy.
-  while (dead_worklist.size() > 0) {
-    Node* use = dead_worklist.pop();
-    int opc = use->Opcode();
-    switch (opc) {
-      case Op_Region: {
-        uint i = 1;
-        for (i = 1; i < use->req(); i++) {
-          if (use->in(i) != C->top()) {
-            break;
-          }
-        }
-        if (i >= use->req()) {
-          for (SimpleDUIterator i(use); i.has_next(); i.next()) {
-            Node* m = i.get();
-            if (m->is_Phi()) {
-              dead_worklist.push(m);
-            }
-          }
-          C->gvn_replace_by(use, C->top());
-        }
-        break;
-      }
-      case Op_AddP:
-      case Op_CreateEx: {
-        // Recursively clean up references to CreateEx so EA doesn't
-        // get unhappy about the partially collapsed graph.
-        for (SimpleDUIterator i(use); i.has_next(); i.next()) {
-          Node* m = i.get();
-          if (m->is_AddP()) {
-            dead_worklist.push(m);
-          }
-        }
-        C->gvn_replace_by(use, C->top());
-        break;
-      }
-      case Op_Phi:
-        if (use->in(0) == C->top()) {
-          C->gvn_replace_by(use, C->top());
-        }
-        break;
-    }
-  }
-}
-
 
 bool StringConcat::validate_mem_flow() {
   Compile* C = _stringopts->C;
