@@ -197,7 +197,7 @@ class StringConcat : public ResourceObj {
     }
   }
 
-  void convert_uncommon_traps(GraphKit& kit, const JVMState* jvms) {
+  void convert_uncommon_traps(GraphKit& kit) {
     for (uint u = 0; u < _uncommon_traps.size(); u++) {
       Node* uct = _uncommon_traps.at(u);
 
@@ -1776,7 +1776,7 @@ void PhaseStringOpts::replace_string_concat(StringConcat* sc) {
   // There may be uncommon traps which are still using the
   // intermediate states and these need to be rewritten to point at
   // the JVMState at the beginning of the transformation.
-  sc->convert_uncommon_traps(kit, jvms);
+  sc->convert_uncommon_traps(kit);
 
   // Now insert the logic to compute the size of the string followed
   // by all the logic to construct array and resulting string.
