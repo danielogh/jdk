@@ -94,10 +94,6 @@ class PhaseStringOpts : public Phase {
   // Returns the value array of a constant string
   ciTypeArray* get_constant_value(GraphKit& kit, Node* str);
 
-  // Clean up any leftover nodes
-  void record_dead_node(Node* node);
-  void remove_dead_nodes();
-
   PhaseGVN* gvn() { return _gvn; }
 
   enum {
