@@ -284,7 +284,75 @@ void StringConcat::eliminate_unneeded_control() {
 }
 
 
+
 StringConcat* StringConcat::merge(StringConcat* other, Node* arg) {
+
+  // Check if this concatenation would result in an excessive number of arguments
+  // -- leading to high memory use, compilation time, and later, a large number of IR nodes
+  // -- and bail out in that case.
+  uint arguments_appended = 0;
+  for (int x = 0; x < num_arguments(); x++) {
+    Node* argx = argument_uncast(x);
+    if (argx == arg) {
+      arguments_appended += other->num_arguments();
+    } else {
+      arguments_appended++;
+    }
+    if (arguments_appended > STACKED_CONCAT_UPPER_BOUND) {
+#ifndef PRODUCT
+      if (PrintOptimizeStringConcat) {
+        tty->print_cr("Merge candidate of length %d exceeds argument limit", arguments_appended);
+      }
+#endif
+      return nullptr;
+    }
+  }
+
+  Unique_Node_List null_check_tostring_uses;
+
+  for (int x = 0; x < num_arguments(); x++) {
+    Node* argx = argument_uncast(x);
+    if (argx != argument(x) && argx == arg) {
+      null_check_tostring_uses.push(argument(x));
+      Node* cmpp = argument(x)->in(0)->in(1)->in(0)->in(1)->as_Bool()->in(1);
+      null_check_tostring_uses.push(cmpp);
+    }
+  }
+
+  Unique_Node_List worklist;
+
+  worklist.push(arg);
+
+  while (worklist.size() > 0) {
+    Node* n = worklist.pop();
+    for (SimpleDUIterator i(n); i.has_next(); i.next()) {
+      Node* use = i.get();
+      if (use->is_CastPP()) {
+        worklist.push(use);
+        continue;
+      }
+      if (use == _arguments) { // hook node.
+        continue;
+      }
+      if (use->Opcode() == Op_CmpP || use->is_Phi()) { // allowed in the case of a string null check.
+        if (!null_check_tostring_uses.member(use)) {
+          DEBUG_ONLY(if (PrintOptimizeStringConcat) { tty->print_cr("CmpP or Phi but not a null check"); use->dump();  } )
+          return nullptr;
+        }
+        continue;
+      }
+      if (use->is_Call()
+          && _control.contains(use)
+          && ((use->is_CallStaticJava() && use->as_CallStaticJava()->method()->name() == ciSymbols::append_name())
+              || _constructors.contains(use)
+              || (!use->as_Call()->has_non_debug_use(n)))) { // debug edge to a call that will be removed
+            continue;
+      }
+      DEBUG_ONLY(if (PrintOptimizeStringConcat) { tty->print_cr("unknown use"); use->dump();  } )
+      return nullptr;
+    } // end for
+  }
+
   StringConcat* result = new StringConcat(_stringopts, _end);
   for (uint x = 0; x < _control.size(); x++) {
     Node* n = _control.at(x);
@@ -301,7 +369,7 @@ StringConcat* StringConcat::merge(StringConcat* other, Node* arg) {
   assert(result->_control.contains(other->_end), "what?");
   assert(result->_control.contains(_begin), "what?");
 
-  uint arguments_appended = 0;
+
   for (int x = 0; x < num_arguments(); x++) {
     Node* argx = argument_uncast(x);
     if (argx == arg) {
@@ -310,21 +378,8 @@ StringConcat* StringConcat::merge(StringConcat* other, Node* arg) {
       for (int y = 0; y < other->num_arguments(); y++) {
         result->append(other->argument(y), other->mode(y));
       }
-      arguments_appended += other->num_arguments();
     } else {
       result->append(argx, mode(x));
-      arguments_appended++;
-    }
-    // Check if this concatenation would result in an excessive number of arguments
-    // -- leading to high memory use, compilation time, and later, a large number of IR nodes
-    // -- and bail out in that case.
-    if (arguments_appended > STACKED_CONCAT_UPPER_BOUND) {
-#ifndef PRODUCT
-      if (PrintOptimizeStringConcat) {
-        tty->print_cr("Merge candidate of length %d exceeds argument limit", arguments_appended);
-      }
-#endif
-      return nullptr;
     }
   }
   result->set_allocation(other->_begin);
@@ -691,10 +746,11 @@ PhaseStringOpts::PhaseStringOpts(PhaseGVN* gvn):
           if (other->end() == csj) {
 #ifndef PRODUCT
             if (PrintOptimizeStringConcat) {
-              tty->print_cr("considering stacked concats");
+              tty->print_cr("considering stacked concats between");
+              other->end()->dump();
+              sc->end()->dump();
             }
 #endif
-
             StringConcat* merged = sc->merge(other, arg);
             if (merged != nullptr && merged->validate_control_flow() && merged->validate_mem_flow()) {
 #ifndef PRODUCT
