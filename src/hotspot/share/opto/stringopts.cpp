@@ -308,48 +308,51 @@ StringConcat* StringConcat::merge(StringConcat* other, Node* arg) {
     }
   }
 
-  Unique_Node_List null_check_tostring_uses;
+  Unique_Node_List null_check_uses_of_tostring;
 
   for (int x = 0; x < num_arguments(); x++) {
     Node* argx = argument_uncast(x);
     if (argx != argument(x) && argx == arg) {
-      null_check_tostring_uses.push(argument(x));
-      Node* cmpp = argument(x)->in(0)->in(1)->in(0)->in(1)->as_Bool()->in(1);
-      null_check_tostring_uses.push(cmpp);
+      Node* phi = argument(x);
+      assert(phi->is_Phi(), "if argx != argument(x), we skipped a string null check and this must be a phi");
+      null_check_uses_of_tostring.push(phi);
+      Node* cmpp = phi->in(0)->in(1)->in(0)->in(1)->as_Bool()->in(1);
+      null_check_uses_of_tostring.push(cmpp);
     }
   }
 
+  // prime worklist with the toString projection and its casts
   Unique_Node_List worklist;
-
   worklist.push(arg);
+  for (SimpleDUIterator i(arg); i.has_next(); i.next()) {
+    Node* use = i.get();
+    if (use->is_CastPP()) {
+      worklist.push(use);
+    }
+  }
 
-  while (worklist.size() > 0) {
-    Node* n = worklist.pop();
-    for (SimpleDUIterator i(n); i.has_next(); i.next()) {
-      Node* use = i.get();
-      if (use->is_CastPP()) {
-        worklist.push(use);
+  for (uint i = 0; i < worklist.size(); i++) {
+    Node* n = worklist.at(i);
+    for (SimpleDUIterator j(n); j.has_next(); j.next()) {
+      Node* use = j.get();
+      if (use->is_CastPP() || use == _arguments) { // one of the above casts or the hook node.
         continue;
-      }
-      if (use == _arguments) { // hook node.
-        continue;
-      }
-      if (use->Opcode() == Op_CmpP || use->is_Phi()) { // allowed in the case of a string null check.
-        if (!null_check_tostring_uses.member(use)) {
-          DEBUG_ONLY(if (PrintOptimizeStringConcat) { tty->print_cr("CmpP or Phi but not a null check"); use->dump();  } )
+      } else if (use->Opcode() == Op_CmpP || use->is_Phi()) { // allowed in the case of a string null check.
+        if (!null_check_uses_of_tostring.member(use)) {
+          DEBUG_ONLY(if (PrintOptimizeStringConcat) { tty->print_cr("CmpP or Phi use of toString outside of a null check"); use->dump();  } )
           return nullptr;
         }
         continue;
-      }
-      if (use->is_Call()
+      } else if (use->is_Call()
           && _control.contains(use)
-          && ((use->is_CallStaticJava() && use->as_CallStaticJava()->method()->name() == ciSymbols::append_name())
-              || _constructors.contains(use)
-              || (!use->as_Call()->has_non_debug_use(n)))) { // debug edge to a call that will be removed
-            continue;
+          && ((use->is_CallStaticJava() && use->as_CallStaticJava()->method()->name() == ciSymbols::append_name()) // an append argument
+              || _constructors.contains(use) // a constructor argument
+              || (!use->as_Call()->has_non_debug_use(n)))) { // debug edge to a concat call that will be removed
+        continue;
+      } else {
+        DEBUG_ONLY(if (PrintOptimizeStringConcat) { tty->print_cr("unknown use of toString"); use->dump();  } )
+        return nullptr;
       }
-      DEBUG_ONLY(if (PrintOptimizeStringConcat) { tty->print_cr("unknown use"); use->dump();  } )
-      return nullptr;
     } // end for
   }
 
