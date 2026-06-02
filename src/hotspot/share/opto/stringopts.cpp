@@ -79,6 +79,7 @@ class StringConcat : public ResourceObj {
 
   bool validate_mem_flow();
   bool validate_control_flow();
+  bool validate_merge(StringConcat* other, Node* arg);
 
   StringConcat* merge(StringConcat* other, Node* arg);
 
@@ -283,9 +284,10 @@ void StringConcat::eliminate_unneeded_control() {
   }
 }
 
-
-
-StringConcat* StringConcat::merge(StringConcat* other, Node* arg) {
+bool StringConcat::validate_merge(StringConcat* other, Node* arg) {
+  // Validate that a merge candidate between SB1 and SB2 does not
+  // consume too many compilation resources, and that the removed
+  // toString of SB1 does not leave behind dependencies on its values.
 
   // Check if this concatenation would result in an excessive number of arguments
   // -- leading to high memory use, compilation time, and later, a large number of IR nodes
@@ -304,20 +306,20 @@ StringConcat* StringConcat::merge(StringConcat* other, Node* arg) {
         tty->print_cr("Merge candidate of length %d exceeds argument limit", arguments_appended);
       }
 #endif
-      return nullptr;
+      return false;
     }
   }
 
-  Unique_Node_List null_check_uses_of_tostring;
+  Unique_Node_List allowed_null_check_uses;
 
   for (int x = 0; x < num_arguments(); x++) {
     Node* argx = argument_uncast(x);
     if (argx != argument(x) && argx == arg) {
       Node* phi = argument(x);
       assert(phi->is_Phi(), "if argx != argument(x), we skipped a string null check and this must be a phi");
-      null_check_uses_of_tostring.push(phi);
+      allowed_null_check_uses.push(phi);
       Node* cmpp = phi->in(0)->in(1)->in(0)->in(1)->as_Bool()->in(1);
-      null_check_uses_of_tostring.push(cmpp);
+      allowed_null_check_uses.push(cmpp);
     }
   }
 
@@ -338,9 +340,13 @@ StringConcat* StringConcat::merge(StringConcat* other, Node* arg) {
       if (use->is_CastPP() || use == _arguments) { // one of the above casts or the hook node.
         continue;
       } else if (use->Opcode() == Op_CmpP || use->is_Phi()) { // allowed in the case of a string null check.
-        if (!null_check_uses_of_tostring.member(use)) {
-          DEBUG_ONLY(if (PrintOptimizeStringConcat) { tty->print_cr("CmpP or Phi use of toString outside of a null check"); use->dump();  } )
-          return nullptr;
+        if (!allowed_null_check_uses.member(use)) {
+#ifndef PRODUCT
+          if (PrintOptimizeStringConcat) {
+              tty->print_cr("CmpP or Phi use of toString outside of a null check");
+          }
+#endif
+          return false;
         }
         continue;
       } else if (use->is_Call()
@@ -350,10 +356,23 @@ StringConcat* StringConcat::merge(StringConcat* other, Node* arg) {
               || (!use->as_Call()->has_non_debug_use(n)))) { // debug edge to a concat call that will be removed
         continue;
       } else {
-        DEBUG_ONLY(if (PrintOptimizeStringConcat) { tty->print_cr("unknown use of toString"); use->dump();  } )
-        return nullptr;
+#ifndef PRODUCT
+        if (PrintOptimizeStringConcat) {
+          tty->print_cr("unknown use of toString");
+        }
+#endif
+        return false;
       }
-    } // end for
+    }
+  }
+
+  return true;
+}
+
+StringConcat* StringConcat::merge(StringConcat* other, Node* arg) {
+
+  if (!validate_merge(other, arg)) {
+    return nullptr;
   }
 
   StringConcat* result = new StringConcat(_stringopts, _end);
@@ -371,7 +390,6 @@ StringConcat* StringConcat::merge(StringConcat* other, Node* arg) {
   }
   assert(result->_control.contains(other->_end), "what?");
   assert(result->_control.contains(_begin), "what?");
-
 
   for (int x = 0; x < num_arguments(); x++) {
     Node* argx = argument_uncast(x);
@@ -749,11 +767,10 @@ PhaseStringOpts::PhaseStringOpts(PhaseGVN* gvn):
           if (other->end() == csj) {
 #ifndef PRODUCT
             if (PrintOptimizeStringConcat) {
-              tty->print_cr("considering stacked concats between");
-              other->end()->dump();
-              sc->end()->dump();
+              tty->print_cr("considering stacked concats");
             }
 #endif
+
             StringConcat* merged = sc->merge(other, arg);
             if (merged != nullptr && merged->validate_control_flow() && merged->validate_mem_flow()) {
 #ifndef PRODUCT
