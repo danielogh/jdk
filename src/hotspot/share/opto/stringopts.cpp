@@ -350,10 +350,14 @@ bool StringConcat::validate_merge(StringConcat* other, Node* arg) {
         }
         continue;
       } else if (use->is_Call()
-          && _control.contains(use)
-          && ((use->is_CallStaticJava() && use->as_CallStaticJava()->method()->name() == ciSymbols::append_name()) // an append argument
-              || _constructors.contains(use) // a constructor argument
-              || (!use->as_Call()->has_non_debug_use(n)))) { // debug edge to a concat call that will be removed
+          &&  // an append argument
+            ((_control.contains(use) && use->is_CallStaticJava() && use->as_CallStaticJava()->method()->name() == ciSymbols::append_name())
+              // a constructor argument
+              || _constructors.contains(use)
+              // a debug edge to a call node that is going away.
+              || (_control.contains(use) && !use->as_Call()->has_non_debug_use(n))
+              // use outside of the chain. permitted for debug edges to uncommon traps.
+              || (!use->as_Call()->has_non_debug_use(n) && use->as_Call()->_name != nullptr && strcmp(use->as_Call()->_name, "uncommon_trap") == 0))) {
         continue;
       } else {
 #ifndef PRODUCT

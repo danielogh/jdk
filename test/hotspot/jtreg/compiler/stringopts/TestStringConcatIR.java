@@ -35,20 +35,27 @@ import compiler.lib.ir_framework.*;
 
 public class TestStringConcatIR {
 
+    int warmup = 0;
+
     public static void main(String[] args) {
-        TestFramework.run();
+        TestFramework.runWithFlags();
     }
 
-    @Warmup(10000)
-    @Run(test = {"stackedConcat", "stackedConcatNullCheck"})
-    public void runMethod() {
+    @Run(test = {"stackedConcat"})
+    public void runMethodA() {
         stackedConcat();
+        // stackedConcatNullCheck();
+    }
+
+    public void runMethodB() {
         stackedConcatNullCheck();
     }
 
     @Test
-    @IR(counts = {IRNode.ALLOC, "= 3"}, phase = {CompilePhase.BEFORE_STRINGOPTS})
-    @IR(counts = {IRNode.ALLOC, "= 1"}, phase = {CompilePhase.ITER_GVN1})
+    @IR(counts = {IRNode.CALL,    ">= 9"}, phase = {CompilePhase.BEFORE_STRINGOPTS}) // at least init, append, tostring x 3
+    @IR(counts = {IRNode.ALLOC,   "= 3"},  phase = {CompilePhase.BEFORE_STRINGOPTS})
+    @IR(counts = {IRNode.CALL,    "= 0"},  phase = {CompilePhase.ITER_GVN1})
+    @IR(counts = {IRNode.ALLOC,   "= 1"},  phase = {CompilePhase.ITER_GVN1})
     @IR(counts = {IRNode.STORE_B, "= 16"}, phase = {CompilePhase.ITER_GVN1})
     static String stackedConcat() {
         String s = "ab";
@@ -59,8 +66,10 @@ public class TestStringConcatIR {
     }
 
     @Test
-    @IR(counts = {IRNode.ALLOC, "= 3"}, phase = {CompilePhase.BEFORE_STRINGOPTS})
-    @IR(counts = {IRNode.ALLOC, "= 1"}, phase = {CompilePhase.ITER_GVN1})
+    @IR(counts = {IRNode.CALL,    ">= 9"}, phase = {CompilePhase.BEFORE_STRINGOPTS})
+    @IR(counts = {IRNode.ALLOC,   "= 3"},  phase = {CompilePhase.BEFORE_STRINGOPTS})
+    @IR(counts = {IRNode.CALL,    "= 0"},  phase = {CompilePhase.ITER_GVN1})
+    @IR(counts = {IRNode.ALLOC,   "= 1"},  phase = {CompilePhase.ITER_GVN1})
     @IR(counts = {IRNode.STORE_B, "= 24"}, phase = {CompilePhase.ITER_GVN1})
     static String stackedConcatNullCheck() {
         String s = "abc";
@@ -70,4 +79,12 @@ public class TestStringConcatIR {
         return s;
     }
 
+    // Prevent profiling of valueOf with a presumed non-null argument
+    @Check(test = "stackedConcatNullCheck")
+    public void checkWithTestInfo(String result, TestInfo info) {
+        if (info.isWarmUp()) {
+            result = result + String.valueOf(warmup % 2 == 0 ? (Object)null : "abc");
+        }
+        warmup++;
+    }
 }
