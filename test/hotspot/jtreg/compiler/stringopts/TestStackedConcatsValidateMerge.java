@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2026, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -33,7 +33,7 @@
  * @run main/othervm -Xbatch
  *                   -XX:CompileThreshold=500
  *                   -XX:CompileOnly=compiler.stringopts.TestStackedConcatsValidateMerge::test*
- *                   compiler.stringopts.TestStackedConcatsValidateMerge 
+ *                   compiler.stringopts.TestStackedConcatsValidateMerge
  * @run main/othervm -Xbatch
  *                   -XX:-TieredCompilation
  *                   -XX:CompileOnly=compiler.stringopts.TestStackedConcatsValidateMerge::test*
@@ -85,7 +85,7 @@ public class TestStackedConcatsValidateMerge {
         return new StringBuilder().append(s).append(s == null ? "x" : "y").append(flag ? "z" : s).toString();
     }
 
-    // JDK-8385428 
+    // JDK-8385428
     static int test2() {
         String s1 = (("a" == null) ? "b" : "c") + 'd';
         String s2 = new StringBuilder(s1).toString();
