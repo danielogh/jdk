@@ -73,9 +73,67 @@ public class TestLongStringConcat {
             toString();
     }
 
+    public static String append500VarInt(int i) {
+        StringBuilder s = new StringBuilder();
+        s = s
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i)
+        .append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i).append(i);
+        return s.toString();
+    }
+
+
     public static void main(String[] args) {
         for (int i = 0; i < 100_000; ++i) {
             test();
+            append500VarInt(i);
         }
     }
 }
