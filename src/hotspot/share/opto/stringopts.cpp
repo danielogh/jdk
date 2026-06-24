@@ -380,6 +380,15 @@ StringConcat* StringConcat::merge(StringConcat* other, Node* arg) {
     }
   }
 
+  result->set_allocation(other->_begin);
+  for (uint i = 0; i < _constructors.size(); i++) {
+    result->add_constructor(_constructors.at(i));
+  }
+
+  for (uint i = 0; i < other->_constructors.size(); i++) {
+    result->add_constructor(other->_constructors.at(i));
+  }
+
   // We add previous _allowed_compares in case of repeated stacked concatenation.
   for (uint i = 0; i < _allowed_compares.size(); i++) {
     result->_allowed_compares.push(_allowed_compares.at(i));
