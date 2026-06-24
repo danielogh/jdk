@@ -77,6 +77,10 @@ public class TestStackedConcatsValidateMerge {
             test4();
         }
 
+        for (int i = 0; i < 100_000; i++) {
+            test5(i % 2 == 0);
+        }
+
     }
 
     // JDK-8385429
@@ -105,4 +109,20 @@ public class TestStackedConcatsValidateMerge {
         String s = new StringBuilder().toString();
         return new StringBuilder(s).toString() == s ? "a" : "b";
     }
+
+    static String test5(boolean test) {
+        String s1 = new String("b");
+        String s2 = new StringBuilder(s1).append(s1).toString();
+        String arg1 = "";
+        String arg2 = "";
+        if (s2 == null) {
+          // arg1 = "null";
+          arg2 = "null";
+        } else {
+          // arg1 = s2;
+          arg2 = "Some other string";
+        }
+        return new StringBuffer(s2).append(arg2).toString();
+    }
+
 }

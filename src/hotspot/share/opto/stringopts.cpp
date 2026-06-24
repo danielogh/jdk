@@ -291,6 +291,7 @@ StringConcat* StringConcat::merge(StringConcat* other, Node* arg) {
   StringConcat* result = new StringConcat(_stringopts, _end);
 
   Unique_Node_List null_check_ifs;
+  Unique_Node_List non_skipped_phis;
 
   for (uint x = 0; x < _control.size(); x++) {
     Node* n = _control.at(x);
@@ -321,13 +322,16 @@ StringConcat* StringConcat::merge(StringConcat* other, Node* arg) {
       if (argument(x)->is_Phi()) {
         Node* phi = argument(x);
         assert(phi->as_Phi()->is_diamond_phi() > 0, "must be a diamond phi (ref. skip_string_null_check).");
-        Node* iff  = phi->in(0)->in(1)->in(0);
+        Node* iff = phi->in(0)->in(1)->in(0);
         Node* bol = iff->in(1);
         Node* cmpp = bol->as_Bool()->in(1);
         null_check_ifs.push(iff);
         result->_allowed_compares.push(cmpp);
       }
     } else {
+      if (argx->is_Phi() && argx->as_Phi()->is_diamond_phi() > 0 && !argx->is_memory_phi() && !is_SB_toString(skip_string_null_check(argx))) {
+        non_skipped_phis.push(argx);
+      }
       result->append(argx, mode(x));
       arguments_appended++;
     }
@@ -361,13 +365,21 @@ StringConcat* StringConcat::merge(StringConcat* other, Node* arg) {
     }
   }
 
-  result->set_allocation(other->_begin);
-  for (uint i = 0; i < _constructors.size(); i++) {
-    result->add_constructor(_constructors.at(i));
+  // Verify that no side Phi is let through as an argument
+  // by allowing its shared If
+  for (uint i = 0; i < non_skipped_phis.size(); i++) {
+    Node* n = non_skipped_phis.at(i);
+    Node* iff = n->in(0)->in(1)->in(0);
+    if (null_check_ifs.member(iff)) {
+#ifndef PRODUCT
+      if (PrintOptimizeStringConcat) {
+        tty->print_cr("null-check region with a concat argument that is isn't skippable; aborting.");
+      }
+#endif
+      return nullptr;
+    }
   }
-  for (uint i = 0; i < other->_constructors.size(); i++) {
-    result->add_constructor(other->_constructors.at(i));
-  }
+
   // We add previous _allowed_compares in case of repeated stacked concatenation.
   for (uint i = 0; i < _allowed_compares.size(); i++) {
     result->_allowed_compares.push(_allowed_compares.at(i));

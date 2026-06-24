@@ -28,6 +28,7 @@
  *          is used as a shared test by two diamond Ifs in the second StringBuilder.
  *          (f): make sure we don't crash outright
  *          (g): external null checks depending on the same test/removed call should not give a wrong result.
+ *          (h): multiple phis attached to the same diamond region; only one is a proper null check phi.
  * @run main/othervm compiler.stringopts.TestStackedConcatsSharedTest
  * @run main/othervm -XX:-TieredCompilation -Xcomp
  *                   -XX:CompileOnly=compiler.stringopts.TestStackedConcatsSharedTest::*
@@ -49,6 +50,11 @@ public class TestStackedConcatsSharedTest {
             System.out.println(z);
             throw new RuntimeException("wrong result");
         }
+        String c = h();
+        if (!c.equals("abcabcnotnull")) {
+            System.out.println(c);
+            throw new RuntimeException("wrong result");
+        }
     }
 
     static String f() {
@@ -65,5 +71,18 @@ public class TestStackedConcatsSharedTest {
         s = new StringBuilder(s).toString();
         s = new StringBuilder(String.valueOf(s)).append(String.valueOf(s)).toString() + (s == null ? "def" : "abc");
         return s;
+    }
+
+    static String h() {
+        String s1 = new String("abc");
+        String s2 = new StringBuilder(s1).append(s1).toString();
+        // String arg1 = "";
+        String arg2 = "";
+        if (s2 == null) {
+          arg2 = "null";
+        } else {
+          arg2 = "notnull";
+        }
+        return new StringBuilder(s2).append(arg2).toString();
     }
 }
