@@ -329,7 +329,9 @@ StringConcat* StringConcat::merge(StringConcat* other, Node* arg) {
         result->_allowed_compares.push(cmpp);
       }
     } else {
-      if (argx->is_Phi() && argx->as_Phi()->is_diamond_phi() > 0 && !argx->is_memory_phi() && !is_SB_toString(skip_string_null_check(argx))) {
+      if (argx->is_Phi() &&
+          argx->as_Phi()->is_diamond_phi() > 0 &&
+          !argx->is_memory_phi()) {
         non_skipped_phis.push(argx);
       }
       result->append(argx, mode(x));
