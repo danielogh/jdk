@@ -649,7 +649,7 @@ static address generate_dilithiumAlmostNtt_avx(StubGenerator *stubgen,
   }
 
   __ leave(); // required for proper stackwalking of RuntimeStub frame
-  __ mov64(rax, 0); // return 0
+  __ mov64(rax, 0); // Intrinsics returns a value of 0, whereas Java callees return 1
   __ ret(0);
 
   // record the stub entry and end
@@ -898,7 +898,7 @@ static address generate_dilithiumAlmostInverseNtt_avx(StubGenerator *stubgen,
   }
 
   __ leave(); // required for proper stackwalking of RuntimeStub frame
-  __ mov64(rax, 0); // return 0
+  __ mov64(rax, 0); // Intrinsics returns a value of 0, whereas Java callees return 1
   __ ret(0);
 
   // record the stub entry and end
@@ -993,7 +993,7 @@ static address generate_dilithiumNttMult_avx(StubGenerator *stubgen,
   __ jcc(Assembler::notEqual, L_loop);
 
   __ leave(); // required for proper stackwalking of RuntimeStub frame
-  __ mov64(rax, 0); // return 0
+  __ mov64(rax, 0); // Intrinsics returns a value of 0, whereas Java callees return 1
   __ ret(0);
 
   // record the stub entry and end
@@ -1089,7 +1089,7 @@ static address generate_dilithiumMontMulByConstant_avx(StubGenerator *stubgen,
   __ jcc(Assembler::notEqual, L_loop);
 
   __ leave(); // required for proper stackwalking of RuntimeStub frame
-  __ mov64(rax, 0); // return 0
+  __ mov64(rax, 0); // Intrinsics returns a value of 0, whereas Java callees return 1
   __ ret(0);
 
   // record the stub entry and end
@@ -1357,7 +1357,7 @@ static address generate_dilithiumDecomposePoly_avx(StubGenerator *stubgen,
   __ jcc(Assembler::notEqual, L_loop);
 
   __ leave(); // required for proper stackwalking of RuntimeStub frame
-  __ mov64(rax, 0); // return 0
+  __ mov64(rax, 0); // Intrinsics returns a value of 0, whereas Java callees return 1
   __ ret(0);
 
   // record the stub entry and end
