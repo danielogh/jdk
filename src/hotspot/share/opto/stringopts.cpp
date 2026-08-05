@@ -291,7 +291,7 @@ StringConcat* StringConcat::merge(StringConcat* other, Node* arg) {
   StringConcat* result = new StringConcat(_stringopts, _end);
 
   Unique_Node_List null_check_ifs;
-  Unique_Node_List external_phis;
+  Unique_Node_List skipped_phis;
 
   for (uint x = 0; x < _control.size(); x++) {
     Node* n = _control.at(x);
@@ -326,14 +326,10 @@ StringConcat* StringConcat::merge(StringConcat* other, Node* arg) {
         Node* bol = iff->in(1);
         Node* cmpp = bol->as_Bool()->in(1);
         null_check_ifs.push(iff);
+        skipped_phis.push(phi);
         result->_allowed_compares.push(cmpp);
       }
     } else {
-      if (argx->is_Phi() &&
-          argx->as_Phi()->is_diamond_phi() > 0 &&
-          !argx->is_memory_phi()) {
-        external_phis.push(argx);
-      }
       result->append(argx, mode(x));
       arguments_appended++;
     }
@@ -367,17 +363,33 @@ StringConcat* StringConcat::merge(StringConcat* other, Node* arg) {
     }
   }
 
-// Verify that the diamond region isn't shared between a null-check phi and any other phi.
-  for (uint i = 0; i < external_phis.size(); i++) {
-    Node* n = external_phis.at(i);
-    Node* iff = n->in(0)->in(1)->in(0);
-    if (null_check_ifs.member(iff)) {
+  // Verify that the diamond region isn't shared with non-null check phis;
+  // and that the associated bool doesn't have external uses.
+  for (uint i = 0; i < skipped_phis.size(); i++) {
+    Node* n = skipped_phis.at(i);
+    Node* r = n->in(0);
+    for (SimpleDUIterator j(r); j.has_next(); j.next()) {
+      Node* n2 = j.get();
+      if (n2->is_Phi() && !n2->is_memory_phi() && !skipped_phis.member(n2)) {
 #ifndef PRODUCT
-      if (PrintOptimizeStringConcat) {
-        tty->print_cr("null-check region with a concat argument that is isn't skippable; aborting.");
-      }
+        if (PrintOptimizeStringConcat) {
+          tty->print_cr("null-check diamond region has external phi uses");
+        }
 #endif
-      return nullptr;
+        return nullptr;
+      }
+    }
+    Node* iff = n->in(0)->in(1)->in(0);
+    Node* bol = iff->in(1);
+    for (SimpleDUIterator j(bol); j.has_next(); j.next()) {
+      if (!null_check_ifs.member(j.get())) {
+#ifndef PRODUCT
+        if (PrintOptimizeStringConcat) {
+          tty->print_cr("null-check diamond bool has external uses.");
+        }
+#endif
+        return nullptr;
+      }
     }
   }
 
