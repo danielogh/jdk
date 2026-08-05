@@ -29,6 +29,7 @@
  *          (f): make sure we don't crash outright
  *          (g): external null checks depending on the same test/removed call should not give a wrong result.
  *          (h): multiple phis attached to the same diamond region; only one is a proper null check phi.
+ *          (i): same test as (h) but with deferred compares
  * @run main/othervm ${test.main.class}
  * @run main/othervm -XX:-TieredCompilation -Xcomp -XX:CompileOnly=${test.main.class}::* ${test.main.class}
  */
@@ -43,14 +44,19 @@ public class TestStackedConcatsSharedTest {
         if (!s.equals("")) {
             throw new RuntimeException("wrong result");
         }
-        String z = g();
-        if (!z.equals("abcabcabc")) {
-            System.out.println(z);
+        s = g();
+        if (!s.equals("abcabcabc")) {
+            System.out.println(s);
             throw new RuntimeException("wrong result");
         }
-        String c = h();
-        if (!c.equals("abcabcnotnull")) {
-            System.out.println(c);
+        s = h();
+        if (!s.equals("abcabcnotnull")) {
+            System.out.println(s);
+            throw new RuntimeException("wrong result");
+        }
+        s = i();
+        if (!s.equals("abcabcnotnull")) {
+            System.out.println(s);
             throw new RuntimeException("wrong result");
         }
     }
@@ -82,5 +88,19 @@ public class TestStackedConcatsSharedTest {
           arg2 = "notnull";
         }
         return new StringBuilder(s2).append(arg2).toString();
+    }
+
+    static String i() {
+        String s1 = new String("abc");
+        String s2 = new StringBuilder(s1).append(s1).toString();
+        String arg2 = "";
+        if (s2 == null) {
+          arg2 = "null";
+        } else {
+          arg2 = "notnull";
+        }
+        String s3 = new StringBuilder(s2).toString();
+        String s4 = new StringBuilder(s3).append(arg2).toString();
+        return s4;
     }
 }
