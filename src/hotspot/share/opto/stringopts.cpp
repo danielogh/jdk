@@ -346,23 +346,6 @@ StringConcat* StringConcat::merge(StringConcat* other, Node* arg) {
     }
   }
 
-  // Verify that no null-check booleans are used in external tests.
-  // Do this pre-check before validate_control_flow() while we still
-  // have the information about the diamond region available.
-  for (uint i = 0; i < null_check_ifs.size(); i++) {
-    Node* bol = null_check_ifs.at(i)->in(1);
-    for (SimpleDUIterator j(bol); j.has_next(); j.next()) {
-      if (!null_check_ifs.member(j.get())) {
-#ifndef PRODUCT
-        if (PrintOptimizeStringConcat) {
-          tty->print_cr("null-check diamond bool has external uses.");
-        }
-#endif
-        return nullptr;
-      }
-    }
-  }
-
   // Verify that the diamond region isn't shared with non-null check phis;
   // and that the associated bool doesn't have external uses.
   for (uint i = 0; i < skipped_phis.size(); i++) {
