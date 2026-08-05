@@ -26,23 +26,23 @@
  * @bug 8362117
  * @summary Prevent crashes and miscompilations when uncommon trap tests
  *          are confused with string null checks
- * @run main/othervm compiler.stringopts.TestStackedConcatsValidateMerge
+ * @run main/othervm compiler.stringopts.TestStringConcatValidateMerge
  * @run main/othervm -Xbatch
- *                   -XX:CompileOnly=compiler.stringopts.TestStackedConcatsValidateMerge::test*
- *                   compiler.stringopts.TestStackedConcatsValidateMerge
+ *                   -XX:CompileOnly=compiler.stringopts.TestStringConcatValidateMerge::test*
+ *                   compiler.stringopts.TestStringConcatValidateMerge
  * @run main/othervm -Xbatch
  *                   -XX:CompileThreshold=500
- *                   -XX:CompileOnly=compiler.stringopts.TestStackedConcatsValidateMerge::test*
- *                   compiler.stringopts.TestStackedConcatsValidateMerge
+ *                   -XX:CompileOnly=compiler.stringopts.TestStringConcatValidateMerge::test*
+ *                   compiler.stringopts.TestStringConcatValidateMerge
  * @run main/othervm -Xbatch
  *                   -XX:-TieredCompilation
- *                   -XX:CompileOnly=compiler.stringopts.TestStackedConcatsValidateMerge::test*
- *                   compiler.stringopts.TestStackedConcatsValidateMerge
+ *                   -XX:CompileOnly=compiler.stringopts.TestStringConcatValidateMerge::test*
+ *                   compiler.stringopts.TestStringConcatValidateMerge
  */
 
 package compiler.stringopts;
 
-public class TestStackedConcatsValidateMerge {
+public class TestStringConcatValidateMerge {
 
     public static void main (String... args) {
 
@@ -91,7 +91,7 @@ public class TestStackedConcatsValidateMerge {
     }
 
     // test1-3: StringOpts can't stack as SB1 is used in a compare in SB2 (previously confused as a valid string null check).
-    // test4: can't remove SB1's toString as it's used in an external comparison that needs it -> reject stacking removing toString result.
+    // test4: can't remove SB1's toString as it's used in an external comparison that needs it -> reject stacking
     // test5: hand-written branching that changes return value (previously mistaken to be a valid string null check).
     // test6: merge an unresolved stringbuilder with the intermediate value used in a compare: reject single concat.
 

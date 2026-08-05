@@ -33,17 +33,17 @@
  *          g: Test compare that depends on an append call result of an unresolved StringBuilder chain.
  *
  * @library /test/lib /
- * @run main/othervm compiler.stringopts.TestStackedConcatsPhiUseOfDiamondRegion
+ * @run main/othervm compiler.stringopts.TestStringConcatValidateMergeXcomp
  * @run main/othervm -XX:-TieredCompilation -Xcomp
- *                   -XX:CompileOnly=compiler.stringopts.TestStackedConcatsPhiUseOfDiamondRegion::*
- *                   compiler.stringopts.TestStackedConcatsPhiUseOfDiamondRegion
+ *                   -XX:CompileOnly=compiler.stringopts.TestStringConcatValidateMergeXcomp::*
+ *                   compiler.stringopts.TestStringConcatValidateMergeXcomp
  */
 
 package compiler.stringopts;
 
 import jdk.test.lib.Asserts;
 
-public class TestStackedConcatsPhiUseOfDiamondRegion {
+public class TestStringConcatValidateMergeXcomp {
 
     public static void main (String... args) {
         new StringBuilder(); // load the class
