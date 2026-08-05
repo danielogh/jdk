@@ -29,10 +29,8 @@
  *          (f): make sure we don't crash outright
  *          (g): external null checks depending on the same test/removed call should not give a wrong result.
  *          (h): multiple phis attached to the same diamond region; only one is a proper null check phi.
- * @run main/othervm compiler.stringopts.TestStackedConcatsSharedTest
- * @run main/othervm -XX:-TieredCompilation -Xcomp
- *                   -XX:CompileOnly=compiler.stringopts.TestStackedConcatsSharedTest::*
- *                   compiler.stringopts.TestStackedConcatsSharedTest
+ * @run main/othervm ${test.main.class}
+ * @run main/othervm -XX:-TieredCompilation -Xcomp -XX:CompileOnly=${test.main.class}::* ${test.main.class}
  */
 
 package compiler.stringopts;

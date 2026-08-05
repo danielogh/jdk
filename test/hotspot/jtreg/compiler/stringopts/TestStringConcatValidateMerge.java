@@ -26,18 +26,15 @@
  * @bug 8362117
  * @summary Prevent crashes and miscompilations when uncommon trap tests
  *          are confused with string null checks
- * @run main/othervm compiler.stringopts.TestStringConcatValidateMerge
+ * @run main/othervm ${test.main.class}
  * @run main/othervm -Xbatch
- *                   -XX:CompileOnly=compiler.stringopts.TestStringConcatValidateMerge::test*
- *                   compiler.stringopts.TestStringConcatValidateMerge
+ *                   -XX:CompileOnly=${test.main.class}::test* ${test.main.class}
  * @run main/othervm -Xbatch
  *                   -XX:CompileThreshold=500
- *                   -XX:CompileOnly=compiler.stringopts.TestStringConcatValidateMerge::test*
- *                   compiler.stringopts.TestStringConcatValidateMerge
+ *                   -XX:CompileOnly=${test.main.class}::test* ${test.main.class}
  * @run main/othervm -Xbatch
  *                   -XX:-TieredCompilation
- *                   -XX:CompileOnly=compiler.stringopts.TestStringConcatValidateMerge::test*
- *                   compiler.stringopts.TestStringConcatValidateMerge
+ *                   -XX:CompileOnly=${test.main.class}::test* ${test.main.class}
  */
 
 package compiler.stringopts;
@@ -81,10 +78,11 @@ public class TestStringConcatValidateMerge {
             test5(i % 2 == 0);
         }
 
+        gold = test6(new StringBuilder(" "));
         for (int i = 0; i < 100_000; i++) {
             val = test6(new StringBuilder(" "));
         }
-        if (!val.equals("    ")) {
+        if (!val.equals(gold)) {
             throw new RuntimeException("wrong result.");
         }
 

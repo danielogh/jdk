@@ -33,10 +33,9 @@
  *          g: Test compare that depends on an append call result of an unresolved StringBuilder chain.
  *
  * @library /test/lib /
- * @run main/othervm compiler.stringopts.TestStringConcatValidateMergeXcomp
+ * @run main/othervm ${test.main.class}
  * @run main/othervm -XX:-TieredCompilation -Xcomp
- *                   -XX:CompileOnly=compiler.stringopts.TestStringConcatValidateMergeXcomp::*
- *                   compiler.stringopts.TestStringConcatValidateMergeXcomp
+ *                   -XX:CompileOnly=${test.main.class}::* ${test.main.class}
  */
 
 package compiler.stringopts;

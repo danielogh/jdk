@@ -1112,6 +1112,8 @@ bool StringConcat::validate_control_flow() {
               ((v1->is_Proj() && is_SB_toString(v1->in(0)) && ctrl_path.member(v1->in(0))) ||
                (v2->is_Proj() && is_SB_toString(v2->in(0)) && ctrl_path.member(v2->in(0))))) {
             // iftrue -> if -> bool -> cmpp -> resproj -> tostring
+            assert(!_allowed_compares.member(cmp) && !local_allowed_compares.member(cmp), "This would have been an unsafe dependency ...");
+            // ... and would be caught by containment analysis later but we can fail early here.
             fail = true;
             break;
           }
@@ -1168,7 +1170,6 @@ bool StringConcat::validate_control_flow() {
         // XXX should check for possibly merging stores.  simple data merges are ok.
         // The IGVN will make this simple diamond go away when it
         // transforms the Region. Make sure it sees it.
-
         Compile::current()->record_for_igvn(ptr);
         _control.push(ptr);
         ptr = ptr->in(1)->in(0)->in(0);
