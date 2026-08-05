@@ -291,7 +291,7 @@ StringConcat* StringConcat::merge(StringConcat* other, Node* arg) {
   StringConcat* result = new StringConcat(_stringopts, _end);
 
   Unique_Node_List null_check_ifs;
-  Unique_Node_List non_skipped_phis;
+  Unique_Node_List external_phis;
 
   for (uint x = 0; x < _control.size(); x++) {
     Node* n = _control.at(x);
@@ -332,7 +332,7 @@ StringConcat* StringConcat::merge(StringConcat* other, Node* arg) {
       if (argx->is_Phi() &&
           argx->as_Phi()->is_diamond_phi() > 0 &&
           !argx->is_memory_phi()) {
-        non_skipped_phis.push(argx);
+        external_phis.push(argx);
       }
       result->append(argx, mode(x));
       arguments_appended++;
@@ -352,7 +352,7 @@ StringConcat* StringConcat::merge(StringConcat* other, Node* arg) {
 
   // Verify that no null-check booleans are used in external tests.
   // Do this pre-check before validate_control_flow() while we still
-  // have the information about the skipped diamond region available.
+  // have the information about the diamond region available.
   for (uint i = 0; i < null_check_ifs.size(); i++) {
     Node* bol = null_check_ifs.at(i)->in(1);
     for (SimpleDUIterator j(bol); j.has_next(); j.next()) {
@@ -367,10 +367,9 @@ StringConcat* StringConcat::merge(StringConcat* other, Node* arg) {
     }
   }
 
-  // Verify that no side Phi is let through as an argument
-  // by allowing its shared If
-  for (uint i = 0; i < non_skipped_phis.size(); i++) {
-    Node* n = non_skipped_phis.at(i);
+// Verify that the diamond region isn't shared between a null-check phi and any other phi.
+  for (uint i = 0; i < external_phis.size(); i++) {
+    Node* n = external_phis.at(i);
     Node* iff = n->in(0)->in(1)->in(0);
     if (null_check_ifs.member(iff)) {
 #ifndef PRODUCT
@@ -395,9 +394,11 @@ StringConcat* StringConcat::merge(StringConcat* other, Node* arg) {
   for (uint i = 0; i < _allowed_compares.size(); i++) {
     result->_allowed_compares.push(_allowed_compares.at(i));
   }
+
   for (uint i = 0; i < other->_allowed_compares.size(); i++) {
     result->_allowed_compares.push(other->_allowed_compares.at(i));
   }
+
   result->_multiple = true;
   return result;
 }
@@ -1238,7 +1239,7 @@ bool StringConcat::validate_control_flow() {
       }
       int opc = use->Opcode();
       if (opc == Op_Node ||
-         (opc == Op_CmpP && (use->outcnt() == 1) // Inexpensive check. The cmpp validation assumes a unique use.
+         (opc == Op_CmpP && (use->outcnt() == 1) // The cmpp validation assumes a unique use.
                          && (local_allowed_compares.member(use) || _allowed_compares.member(use)))) {
         ctrl_path.push(use);
         continue;

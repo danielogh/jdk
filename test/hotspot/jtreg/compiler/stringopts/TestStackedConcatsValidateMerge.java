@@ -81,7 +81,19 @@ public class TestStackedConcatsValidateMerge {
             test5(i % 2 == 0);
         }
 
+        for (int i = 0; i < 100_000; i++) {
+            val = test6(new StringBuilder(" "));
+        }
+        if (!val.equals("    ")) {
+            throw new RuntimeException("wrong result.");
+        }
+
     }
+
+    // test1-3: StringOpts can't stack as SB1 is used in a compare in SB2 (previously confused as a valid string null check).
+    // test4: can't remove SB1's toString as it's used in an external comparison that needs it -> reject stacking removing toString result.
+    // test5: hand-written branching that changes return value (previously mistaken to be a valid string null check).
+    // test6: merge an unresolved stringbuilder with the intermediate value used in a compare: reject single concat.
 
     // JDK-8385429
     static String test1(boolean flag) {
@@ -123,6 +135,12 @@ public class TestStackedConcatsValidateMerge {
           arg2 = "Some other string";
         }
         return new StringBuffer(s2).append(arg2).toString();
+    }
+
+    static String test6(StringBuilder c) {
+        StringBuilder s = new StringBuilder().append(" ");
+        String ret = s.append(s == c ? "abc" : "   ").toString();
+        return ret;
     }
 
 }
