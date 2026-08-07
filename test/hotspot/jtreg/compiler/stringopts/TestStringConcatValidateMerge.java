@@ -24,8 +24,8 @@
 /*
  * @test
  * @bug 8362117
- * @summary Prevent crashes and miscompilations when uncommon trap tests
- *          are confused with string null checks
+ * @summary Prevent crashes and miscompilations when external constructs
+ *          could be confused for StringConcat append/toString-null checks.
  * @run main/othervm ${test.main.class}
  * @run main/othervm -Xbatch
  *                   -XX:CompileOnly=${test.main.class}::test* ${test.main.class}

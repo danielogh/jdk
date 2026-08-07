@@ -24,14 +24,12 @@
 /*
  * @test
  * @bug 8362117
- * @summary f: Test stacked string concatenations where the toString result
- *          of the first StringBuilder chain is used as a test for a
- *          simple diamond in the second StringBuilder. If the region of
- *          the simple diamond has a Phi that is used as a parameter in the
- *          concatenation, a wrong result should not be produced.
- *
- *          g: Test compare that depends on an append call result of an unresolved StringBuilder chain.
- *
+ * @summary Similar type of test scenarios as in TestStringConcatValidateMerge.java
+ *          but for problems which manifested with -Xcomp
+ *          (f): stringopts shouldn't confuse ternary expression with string null check
+ *               and fold away diamond phi arbitrarily leading to wrong result when depending on
+ *               toString of SB1.
+ *          (g): variant of (f) with append instead of toString
  * @library /test/lib /
  * @run main/othervm ${test.main.class}
  * @run main/othervm -XX:-TieredCompilation -Xcomp

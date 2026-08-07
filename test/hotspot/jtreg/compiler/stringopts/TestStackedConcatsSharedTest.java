@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2026, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -29,7 +29,7 @@
  *          (f): make sure we don't crash outright
  *          (g): external null checks depending on the same test/removed call should not give a wrong result.
  *          (h): multiple phis attached to the same diamond region; only one is a proper null check phi.
- *          (i): same test as (h) but with deferred compares
+ *          (i): non-null check phi reused after intermediate stacked concat: check for correct result
  * @run main/othervm ${test.main.class}
  * @run main/othervm -XX:-TieredCompilation -Xcomp -XX:CompileOnly=${test.main.class}::* ${test.main.class}
  */
