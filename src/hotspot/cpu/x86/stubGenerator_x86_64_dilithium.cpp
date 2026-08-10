@@ -308,7 +308,7 @@ static auto whole_montMul(XMMRegister montQInvModR, XMMRegister dilithium_q,
       }
     }
 
-    // scratch1 = input1_even*intput2_even
+    // scratch1 = input1_even*input2_even
     for (int i = 0; i < regCnt; i++) {
       __ vpmuldq(scratch1[i], input1[i], input2[i], vector_len);
     }
