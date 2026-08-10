@@ -423,7 +423,7 @@ static address generate_dilithiumAlmostNtt_avx(StubGenerator *stubgen,
   // products will be added to and subtracted from the other half of the
   // coefficients. In each level we just shuffle the coefficients that need to
   // be multiplied by the zetas in one set, the rest to another set of vector
-  // registers, then redistribute the addition/substraction results.
+  // registers, then redistribute the addition/subtraction results.
 
   // For levels 0 and 1 the zetas are not different within the 4 xmm registers
   // that we would use for them, so we use only one register.
