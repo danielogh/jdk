@@ -1002,7 +1002,7 @@ static address generate_dilithiumNttMult_avx(StubGenerator *stubgen,
   return start;
 }
 
-// Dilithium Montomery multiply an array by a constant.
+// Dilithium Montgomery multiply an array by a constant.
 // Implements
 // static int implDilithiumMontMulByConstant(int[] coeffs, int constant) {}
 //
