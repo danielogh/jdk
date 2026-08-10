@@ -492,7 +492,7 @@ address generate_kyberNtt_avx512(StubGenerator *stubgen,
   store4regs(coeffs, 256, xmm4_7, _masm);
 
   __ leave(); // required for proper stackwalking of RuntimeStub frame
-  __ mov64(rax, 0); // Intrinsics returns a value of 0, whereas Java callees return 1
+  __ mov64(rax, 0); // Intrinsic returns a value of 0, whereas Java callees return 1
   __ ret(0);
 
   // record the stub entry and end
@@ -623,7 +623,7 @@ address generate_kyberInverseNtt_avx512(StubGenerator *stubgen,
   store4regs(coeffs, 256, xmm12_15, _masm);
 
   __ leave(); // required for proper stackwalking of RuntimeStub frame
-  __ mov64(rax, 0); // Intrinsics returns a value of 0, whereas Java callees return 1
+  __ mov64(rax, 0); // Intrinsic returns a value of 0, whereas Java callees return 1
   __ ret(0);
 
   // record the stub entry and end
@@ -773,7 +773,7 @@ address generate_kyberNttMult_avx512(StubGenerator *stubgen,
   __ pop_ppx(r12);
 
   __ leave(); // required for proper stackwalking of RuntimeStub frame
-  __ mov64(rax, 0); // Intrinsics returns a value of 0, whereas Java callees return 1
+  __ mov64(rax, 0); // Intrinsic returns a value of 0, whereas Java callees return 1
   __ ret(0);
 
   // record the stub entry and end
@@ -826,7 +826,7 @@ address generate_kyberAddPoly_2_avx512(StubGenerator *stubgen,
   store4regs(result, 256, xmm4_7, _masm);
 
   __ leave(); // required for proper stackwalking of RuntimeStub frame
-  __ mov64(rax, 0); // Intrinsics returns a value of 0, whereas Java callees return 1
+  __ mov64(rax, 0); // Intrinsic returns a value of 0, whereas Java callees return 1
   __ ret(0);
 
   // record the stub entry and end
@@ -888,7 +888,7 @@ address generate_kyberAddPoly_3_avx512(StubGenerator *stubgen,
   store4regs(result, 256, xmm4_7, _masm);
 
   __ leave(); // required for proper stackwalking of RuntimeStub frame
-  __ mov64(rax, 0); // Intrinsics returns a value of 0, whereas Java callees return 1
+  __ mov64(rax, 0); // Intrinsic returns a value of 0, whereas Java callees return 1
   __ ret(0);
 
   // record the stub entry and end
@@ -977,7 +977,7 @@ address generate_kyber12To16_avx512(StubGenerator *stubgen,
       __ jcc(Assembler::greater, VBMILoop);
 
     __ leave(); // required for proper stackwalking of RuntimeStub frame
-    __ mov64(rax, 0); // Intrinsics returns a value of 0, whereas Java callees return 1
+    __ mov64(rax, 0); // Intrinsic returns a value of 0, whereas Java callees return 1
     __ ret(0);
 
     // record the stub entry and end
@@ -1053,7 +1053,7 @@ address generate_kyber12To16_avx512(StubGenerator *stubgen,
     __ jcc(Assembler::greater, Loop);
 
   __ leave(); // required for proper stackwalking of RuntimeStub frame
-  __ mov64(rax, 0); // Intrinsics returns a value of 0, whereas Java callees return 1
+  __ mov64(rax, 0); // Intrinsic returns a value of 0, whereas Java callees return 1
   __ ret(0);
 
   // record the stub entry and end
@@ -1098,7 +1098,7 @@ address generate_kyberBarrettReduce_avx512(StubGenerator *stubgen,
   store4regs(coeffs, 256, xmm4_7, _masm);
 
   __ leave(); // required for proper stackwalking of RuntimeStub frame
-  __ mov64(rax, 0); // Intrinsics returns a value of 0, whereas Java callees return 1
+  __ mov64(rax, 0); // Intrinsic returns a value of 0, whereas Java callees return 1
   __ ret(0);
 
   // record the stub entry and end
