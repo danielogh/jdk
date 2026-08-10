@@ -693,7 +693,7 @@ static address generate_sha3_implCompress_avx2(StubId stub_id,
   __ subptr(rsp, reg_size*2);
 
   // Registers for memory load
-  // Notice the careful 'missalignment' of pairs.
+  // Notice the careful 'misalignment' of pairs.
   // This helps XOR for all blocksizes
   XMMRegister    a0a1,   _a2,   a3a4;
   XMMRegister   a5a6,   a7a8,    _a9;
