@@ -254,7 +254,7 @@ static auto whole_shuffle(Register scratch, KRegister mergeMask1, KRegister merg
 //         swap the second operand (zetas) since the odd slots contain the same number
 //         as the corresponding even one. This is indicated by input2NeedsShuffle=false)
 //
-// The registers to be multiplied are in input1[] and inputs2[]. The results go
+// The registers to be multiplied are in input1[] and input2[]. The results go
 // into output[]. Two scratch[] register arrays are expected. input1[] can
 // overlap with either output[] or scratch1[]
 // - If AVX512, all register arrays are of length 4
@@ -279,7 +279,7 @@ static auto whole_montMul(XMMRegister montQInvModR, XMMRegister dilithium_q,
     // If so, use output:
     const XMMRegister* scratch = scratch1 == input1 ? output: scratch1;
 
-    // scratch = input1_even * intput2_even
+    // scratch = input1_even * input2_even
     for (int i = 0; i < regCnt; i++) {
       __ vpmuldq(scratch[i], input1[i], input2[i], vector_len);
     }
