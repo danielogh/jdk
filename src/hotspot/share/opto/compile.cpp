@@ -2715,6 +2715,7 @@ void Compile::inline_string_calls(bool parse_time) {
     PhaseRemoveUseless pru(initial_gvn(), *igvn_worklist());
   }
 
+  if (C->do_stringopts())
   {
     ResourceMark rm;
     print_method(PHASE_BEFORE_STRINGOPTS, 3);

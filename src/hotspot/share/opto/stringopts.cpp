@@ -25,6 +25,7 @@
 #include "ci/ciSymbols.hpp"
 #include "classfile/javaClasses.hpp"
 #include "compiler/compileLog.hpp"
+#include "opto/c2compiler.hpp"
 #include "opto/callnode.hpp"
 #include "opto/graphKit.hpp"
 #include "opto/idealKit.hpp"
@@ -2085,7 +2086,7 @@ void PhaseStringOpts::replace_string_concat(StringConcat* sc) {
 
   if (kit.stopped()) {
     assert(static_overflow, "no reachable success path for a non-overflow case.");
-    C->record_method_not_compilable("StringConcat replacement did not produce a reachable success path.");
+    C->record_failure(C2Compiler::retry_no_stringopts());
     return;
   }
 
