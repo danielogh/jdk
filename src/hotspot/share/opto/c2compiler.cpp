@@ -222,6 +222,10 @@ void C2Compiler::compile_method(ciEnv* env, ciMethod* target, int entry_bci, boo
         do_locks_coarsening = false;
         continue;  // retry
       }
+      if (do_stringopts) {
+        do_stringopts = false;
+        continue;  // retry
+      }
     }
     // print inlining for last compilation only
     C.dump_print_inlining();
