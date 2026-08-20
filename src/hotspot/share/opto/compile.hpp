@@ -188,7 +188,7 @@ class Options {
   const bool _eliminate_boxing;      // Do boxing elimination.
   const bool _do_locks_coarsening;   // Do locks coarsening
   const bool _do_superword;          // Do SuperWord
-  const bool _do_stringopts;         // Optimize string concatenations
+  const bool _do_stringopts;         // Do StringOpts 
   const bool _install_code;          // Install the code that was compiled
  public:
   Options(bool subsume_loads,
