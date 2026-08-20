@@ -484,7 +484,7 @@
                                                                             \
   develop(bool, StressRecompilation, false,                                 \
           "Recompile each compiled method while successively disabling "    \
-          "optimization phases.                                             \
+          "selected optimizations.                                          \
                                                                             \
   develop(intx, ImplicitNullCheckThreshold, 3,                              \
           "Don't do implicit null checks if NPE's in a method exceeds "     \
