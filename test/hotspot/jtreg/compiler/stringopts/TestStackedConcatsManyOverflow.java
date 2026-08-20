@@ -29,6 +29,7 @@
  * @library /test/lib /
  * @run main/othervm ${test.main.class}
  * @run main/othervm -XX:-TieredCompilation -Xcomp
+ *                   -XX:+AbortVMOnCompilationFailure
  *                   -XX:CompileOnly=${test.main.class}::*
  *                   -XX:CompileCommand=inline,${test.main.class}::double30
  *                   -XX:CompileCommand=dontinline,java.lang.String::valueOf

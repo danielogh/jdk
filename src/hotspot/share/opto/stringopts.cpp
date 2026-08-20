@@ -718,7 +718,7 @@ PhaseStringOpts::PhaseStringOpts(PhaseGVN* gvn):
   Phase(StringOpts),
   _gvn(gvn) {
 
-  assert(OptimizeStringConcat, "shouldn't be here");
+  assert(C->do_stringopts(), "shouldn't be here");
 
   // Collect the types needed to talk about the various slices of memory
   byte_adr_idx = C->get_alias_index(TypeAryPtr::BYTES);
