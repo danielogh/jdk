@@ -2075,9 +2075,9 @@ void PhaseStringOpts::replace_string_concat(StringConcat* sc) {
       overflow->set_req(argi, __ IfTrue(iff));
       if (!prev_stopped && kit.stopped()) {
         // There could be downstream users in either a later call to replace_string_concat
-        // or late inlines that expect a live result.  This is an edge case:
+        // or late inlines that expect a live result. This is an edge case:
         // having a statically known overflowing concat, where we would throw an OOM error at runtime if it is reached,
-        // and at this point we have done destructive graph updates; hence do a hard bailout.
+        // and at this point we have done destructive graph updates; hence do a bailout (with retry).
         static_overflow = true;
         break;
       }
