@@ -327,7 +327,9 @@ public class CtwRunner {
                 "-XX:StressSeed=" + rng.nextInt(Integer.MAX_VALUE),
                 // Do not fail on huge methods where StressGCM makes register
                 // allocation allocate lots of memory
-                "-XX:CompileCommand=memlimit,*.*,0"));
+                "-XX:CompileCommand=memlimit,*.*,0",
+                // Enable all but def-use verification as it's very expensive.
+                "-XX:VerifyIterativeGVN=111110"));
 
         // Use this stress mode 10% of the time as it could make some long-running compilations likely to abort.
         if (rng.nextInt(10) == 0) {
