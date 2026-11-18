@@ -4485,6 +4485,41 @@ address StubGenerator::generate_floatToFloat16() {
   return start;
 }
 
+/**
+*  Arguments:
+*
+*  Input:
+*       xmm0   - float
+*
+*  Output:
+*        rax   - float16  jshort
+*/
+address StubGenerator::generate_doubleToFloat16() {
+  StubId stub_id = StubId::stubgen_d2hf_id;
+  int entry_count = StubInfo::entry_count(stub_id);
+  assert(entry_count == 1, "sanity check");
+  address start = load_archive_data(stub_id);
+  if (start != nullptr) {
+    return start;
+  }
+  StubCodeMark mark(this, stub_id);
+
+  start = __ pc();
+
+  BLOCK_COMMENT("Entry:");
+  // No need for RuntimeStub frame since it is called only during JIT compilation
+
+  // Convert and put result into rax
+  __ dbl_to_flt16(rax, xmm0, xmm1);
+
+  __ ret(0);
+
+  // record the stub entry and end
+  store_archive_data(stub_id, start, __ pc());
+
+  return start;
+}
+
 static void save_return_registers(MacroAssembler* masm) {
   masm->push_ppx(rax);
   if (ValueTypeReturnedAsFields) {
@@ -4957,6 +4992,10 @@ void StubGenerator::generate_initial_stubs() {
       StubRoutines::_hf2f = generate_float16ToFloat();
       StubRoutines::_f2hf = generate_floatToFloat16();
     }
+  }
+
+  if (VM_Version::supports_float16()) {
+    StubRoutines::_d2hf = generate_doubleToFloat16();
   }
 
   generate_libm_stubs();

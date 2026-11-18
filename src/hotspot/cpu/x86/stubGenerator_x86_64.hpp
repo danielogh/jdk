@@ -563,6 +563,7 @@ class StubGenerator: public StubCodeGenerator {
 
   address generate_float16ToFloat();
   address generate_floatToFloat16();
+  address generate_doubleToFloat16();
 
   // Libm trigonometric stubs
 

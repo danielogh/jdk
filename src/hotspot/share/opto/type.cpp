@@ -1691,6 +1691,12 @@ const TypeH* TypeH::make(float f) {
   return (TypeH*)(new TypeH(hf))->hashcons();
 }
 
+const TypeH* TypeH::make(double f) {
+  assert(StubRoutines::d2hf_adr() != nullptr, "");
+  short hf = StubRoutines::d2hf(f);
+  return (TypeH*)(new TypeH(hf))->hashcons();
+}
+
 const Type* TypeH::xmeet(const Type* t) const {
   // Current "this->_base" is FloatCon
   switch (t->base()) {

@@ -662,6 +662,8 @@
   do_entry(initial, f2hf, f2hf, f2hf_adr)                               \
   do_stub(initial, hf2f)                                                \
   do_entry(initial, hf2f, hf2f, hf2f_adr)                               \
+  do_stub(initial, d2hf)                                                \
+  do_entry(initial, d2hf, d2hf, d2hf_adr)                               \
   do_stub(initial, dexp)                                                \
   do_entry(initial, dexp, dexp, dexp)                                   \
   do_stub(initial, dlog)                                                \

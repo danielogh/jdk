@@ -2083,6 +2083,13 @@ void Assembler::vcvtps2ph(XMMRegister dst, XMMRegister src, int imm8, int vector
   emit_int24(0x1D, (0xC0 | encode), imm8);
 }
 
+void Assembler::vcvtsd2sh(XMMRegister dst, XMMRegister src, int imm8, int vector_len) {
+  assert(VM_Version::supports_evex() || VM_Version::supports_f16c(), ""); // TODO more stringent check
+  InstructionAttr attributes(vector_len, /* rex_w */ false, /* legacy_mode */ false, /* no_mask_reg */ true, /*uses_vl */ true);
+  int encode = vex_prefix_and_encode(src->encoding(), 0, dst->encoding(), VEX_SIMD_F2, VEX_OPCODE_MAP5, &attributes);
+  emit_int24(0x5A, (0xC0 | encode), imm8);
+}
+
 void Assembler::evcvtps2ph(Address dst, KRegister mask, XMMRegister src, int imm8, int vector_len) {
   assert(VM_Version::supports_evex(), "");
   InstructionMark im(this);

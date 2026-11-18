@@ -563,6 +563,7 @@ public:
 public:
   const short _f;                        // Half Float constant
 
+  static const TypeH* make(double f);
   static const TypeH* make(float f);
   static const TypeH* make(short f);
 
