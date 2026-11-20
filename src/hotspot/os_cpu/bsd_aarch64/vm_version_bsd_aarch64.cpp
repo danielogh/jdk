@@ -99,12 +99,6 @@ void VM_Version::get_os_cpu_info() {
   if (cpu_has("hw.optional.arm.FEAT_SB")) {
     set_feature(CPU_SB);
   }
-  if (cpu_has("hw.optional.arm.FEAT_FPHP")) {
-    set_feature(CPU_FPHP);
-  }
-  if (cpu_has("hw.optional.arm.FEAT_ASIMDHP")) {
-    set_feature(CPU_ASDIMHP);
-  }
 
   int cache_line_size;
   int hw_conf_cache_line[] = { CTL_HW, HW_CACHELINE };
