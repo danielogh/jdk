@@ -2021,6 +2021,7 @@ void mvnw(Register Rd, Register Rm,
   INSN(fcvts,  0b00, 0b000101);   // Single-precision to double-precision
   INSN(fcvths, 0b11, 0b000100);   // Half-precision to single-precision
   INSN(fcvtsh, 0b00, 0b000111);   // Single-precision to half-precision
+  INSN(fcvthd, 0b00, 0b000111);   // Double-precision to half-precision
 
   INSN(fmovd,  0b01, 0b000000);
   INSN(fabsd,  0b01, 0b000001);
