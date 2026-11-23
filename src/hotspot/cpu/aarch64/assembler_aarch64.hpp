@@ -2027,6 +2027,7 @@ void mvnw(Register Rd, Register Rm,
   INSN(fnegd,  0b01, 0b000010);
   INSN(fsqrtd, 0b01, 0b000011);
   INSN(fcvtd,  0b01, 0b000100);   // Double-precision to single-precision
+  INSN(fcvtdh, 0b01, 0b000111);   // Double-precision to half-precision
 
   INSN(fsqrth, 0b11, 0b000011);   // Half-precision sqrt
 

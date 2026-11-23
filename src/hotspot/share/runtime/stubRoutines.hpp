@@ -350,8 +350,8 @@ public:
   static jshort d2hf(jdouble x) {
     assert(_d2hf != nullptr, "stub is not implemented on this platform");
     MACOS_AARCH64_ONLY(ThreadWXEnable wx(WXExec, Thread::current());) // About to call into code cache
-    typedef jdouble (*df2f_stub_t)(jshort x);
-    return ((df2f_stub_t)_d2hf)(x);
+    typedef jshort (*d2hf_stub_t)(jdouble x);
+    return ((d2hf_stub_t)_d2hf)(x);
   }
 
   static address select_fill_function(BasicType t, bool aligned, const char* &name);

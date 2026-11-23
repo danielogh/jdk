@@ -604,6 +604,11 @@ public:
     fcvths(dst, tmp);
   }
 
+  void dbl_to_flt16(Register dst, FloatRegister src, FloatRegister tmp) {
+    fcvtdh(tmp, src);
+    smov(dst, tmp, H, 0);
+  }
+
   // Generalized Test Bit And Branch, including a "far" variety which
   // spans more than 32KiB.
   void tbr(Condition cond, Register Rt, int bitpos, Label &dest, bool isfar = false) {

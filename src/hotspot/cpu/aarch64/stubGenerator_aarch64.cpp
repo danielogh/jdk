@@ -10896,6 +10896,30 @@ class StubGenerator: public StubCodeGenerator {
     return entry;
   }
 
+  // v0 = input (double)
+  // r0 = result (float16)
+  // v1 = temporary float register
+  address generate_doubleToFloat16() {
+    StubId stub_id = StubId::stubgen_d2hf_id;
+    int entry_count = StubInfo::entry_count(stub_id);
+    assert(entry_count == 1, "sanity check");
+    address start = load_archive_data(stub_id);
+    if (start != nullptr) {
+      return start;
+    }
+    __ align(CodeEntryAlignment);
+    StubCodeMark mark(this, stub_id);
+    address entry = __ pc();
+    BLOCK_COMMENT("Entry:");
+    __ dbl_to_flt16(r0, v0, v1);
+    __ ret(lr);
+
+    // record the stub entry and end
+    store_archive_data(stub_id, entry, __ pc());
+
+    return entry;
+  }
+
   address generate_method_entry_barrier() {
     StubId stub_id = StubId::stubgen_method_entry_barrier_id;
     int entry_count = StubInfo::entry_count(stub_id);
@@ -13862,6 +13886,10 @@ class StubGenerator: public StubCodeGenerator {
         vmIntrinsics::is_intrinsic_available(vmIntrinsics::_floatToFloat16)) {
       StubRoutines::_hf2f = generate_float16ToFloat();
       StubRoutines::_f2hf = generate_floatToFloat16();
+    }
+
+    if (VM_Version::supports_float16()) {
+      StubRoutines::_d2hf = generate_doubleToFloat16();
     }
   }
 
