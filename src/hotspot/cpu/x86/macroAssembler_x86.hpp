@@ -229,7 +229,7 @@ class MacroAssembler: public Assembler {
 
   void dbl_to_flt16(Register dst, XMMRegister src, XMMRegister tmp) {
     // Use separate tmp XMM register because future callers may
-    // requires src XMM register to be unchanged.
+    // require the src XMM register to be unchanged.
     vcvtsd2sh(tmp, src, Assembler::AVX_128bit);
     movdl(dst, tmp);
     movswl(dst, dst);
