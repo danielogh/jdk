@@ -1298,7 +1298,7 @@ private:
   // Convert Halffloat to Single Precision Floating-Point value
   void vcvtps2ph(XMMRegister dst, XMMRegister src, int imm8, int vector_len);
   void vcvtph2ps(XMMRegister dst, XMMRegister src, int vector_len);
-  void vcvtsd2sh(XMMRegister dst, XMMRegister src, int imm8, int vector_len);
+  void vcvtsd2sh(XMMRegister dst, XMMRegister src, int vector_len);
   void evcvtps2ph(Address dst, KRegister mask, XMMRegister src, int imm8, int vector_len);
   void vcvtps2ph(Address dst, XMMRegister src, int imm8, int vector_len);
   void vcvtph2ps(XMMRegister dst, Address src, int vector_len);

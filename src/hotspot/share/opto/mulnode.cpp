@@ -1936,20 +1936,19 @@ const Type* FmaHFNode::Value(PhaseGVN* phase) const {
   const Type* t3 = phase->type(in(3));
   if (t3 == Type::TOP) { return Type::TOP; }
   if (t3->base() != Type::HalfFloatCon) { return Type::HALF_FLOAT; }
-/*
 #ifndef __STDC_IEC_559__
   return Type::HALF_FLOAT;
 #else
-*/
+
   double d1 = t1->getf();
   double d2 = t2->getf();
   double d3 = t3->getf();
 
   return TypeH::make(d1 * d2 + d3);
 }
-    
+
 //=============================================================================
-//-  -----------------------------hash-------------------------------------------
+//------------------------------hash-------------------------------------------
 // Hash function for MulAddS2INode.  Operation is commutative with commutative pairs.
 // The hash function must return the same value when edge swapping is performed.
 uint MulAddS2INode::hash() const {

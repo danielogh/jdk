@@ -2083,7 +2083,7 @@ void Assembler::vcvtps2ph(XMMRegister dst, XMMRegister src, int imm8, int vector
   emit_int24(0x1D, (0xC0 | encode), imm8);
 }
 
-void Assembler::vcvtsd2sh(XMMRegister dst, XMMRegister src, int imm8, int vector_len) {
+void Assembler::vcvtsd2sh(XMMRegister dst, XMMRegister src, int vector_len) {
   assert(VM_Version::supports_avx512_fp16(), "");
   InstructionAttr attributes(vector_len, /* rex_w */ true, /* legacy_mode */ false, /* no_mask_reg */ true, /*uses_vl */ false);
   attributes.set_is_evex_instruction();
