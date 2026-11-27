@@ -1939,12 +1939,12 @@ const Type* FmaHFNode::Value(PhaseGVN* phase) const {
 #ifndef __STDC_IEC_559__
   return Type::HALF_FLOAT;
 #else
-
+  // calculating the result in float64 avoids double rounding errors on conversion to float16
   double d1 = t1->getf();
   double d2 = t2->getf();
   double d3 = t3->getf();
-
   return TypeH::make(d1 * d2 + d3);
+#endif
 }
 
 //=============================================================================

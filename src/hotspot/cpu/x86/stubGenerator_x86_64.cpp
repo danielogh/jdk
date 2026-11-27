@@ -4489,7 +4489,7 @@ address StubGenerator::generate_floatToFloat16() {
 *  Arguments:
 *
 *  Input:
-*       xmm0   - float
+*       xmm0   - double
 *
 *  Output:
 *        rax   - float16  jshort
@@ -4984,7 +4984,7 @@ void StubGenerator::generate_initial_stubs() {
     StubRoutines::_updateBytesCRC32C = generate_updateBytesCRC32C(supports_clmul);
   }
 
-  if (VM_Version::supports_float16()) {
+  if (VM_Version::supports_avx512_fp16()) {
     // For results consistency both intrinsics should be enabled.
     // vmIntrinsics checks InlineIntrinsics flag, no need to check it here.
     if (vmIntrinsics::is_intrinsic_available(vmIntrinsics::_float16ToFloat) &&
@@ -4992,9 +4992,6 @@ void StubGenerator::generate_initial_stubs() {
       StubRoutines::_hf2f = generate_float16ToFloat();
       StubRoutines::_f2hf = generate_floatToFloat16();
     }
-  }
-
-  if (VM_Version::supports_float16()) {
     StubRoutines::_d2hf = generate_doubleToFloat16();
   }
 

@@ -756,7 +756,7 @@ public class TestFloat16ScalarOperations {
         assertResult(fma(valueOf(1.0f), valueOf(2.0f), valueOf(3.0f)).floatValue(), 1.0f * 2.0f + 3.0f, "testFMAConstantFolding");
 
         // Avoid double rounding inaccuracies.
-        assertResult(fma(valueOf(0x1.08p7f), valueOf(0x1.04p7f), valueOf(0x1.0p-24f)).floatValue() , 0x1.0c4p14f, "testFMAConstantFolding");
+        assertResult(fma(valueOf(0x1.08p7f), valueOf(0x1.04p7f), valueOf(0x1.0p-24f)).floatValue(), 0x1.0c4p14f, "testFMAConstantFolding");
     }
 
     @Test
